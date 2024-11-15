@@ -2,10 +2,19 @@
 
 This is a web-based application that allows users to dynamically create editable divs and custom containers, all with drag-and-drop functionality. The application also includes an autosave feature that saves the state of the elements to **localStorage**, ensuring that users' changes persist even after refreshing or reopening the page.
 
-Live URL: 
-Option 1: From htmlpreview.github.io 
+## Live URL:
 
-Option 1: From rawcdn.githack.com 
+### Version 2:
+
+##### Option 1: From [htmlpreview.github.io](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html)
+
+##### Option 2: From [rawcdn.githack.com](https://rawcdn.githack.com/KhemnarMayuresh/Tools/d63d03564fb59a87508e3c5a153a23b9316b66d7/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html)
+
+### Version 1:
+
+##### Option 1: From [htmlpreview.github.io](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/64e57f6094d13a0059acef2f4b16012931fdf5e9/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html)
+
+##### Option 2: From [rawcdn.githack.com](https://rawcdn.githack.com/KhemnarMayuresh/Tools/64e57f6094d13a0059acef2f4b16012931fdf5e9/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html)
 
 ## Features
 
@@ -25,28 +34,36 @@ Option 1: From rawcdn.githack.com
 ## How to Use
 
 ### 1. **Create a Custom Container**
+
 - Click the **Create Custom Container** button on the sidebar to add a new custom container to the main area. The container can hold multiple editable divs and can be resized.
 
 ### 2. **Add Editable Divs**
+
 - Click the **Add Editable Div** button to add a new editable div inside the first custom container. The div is initially populated with default text ("Edit me!").
 - The div is **content-editable**, so users can directly edit the text within the div.
 
 ### 3. **Drag-and-Drop**
+
 - You can drag the editable divs within the container. The divs can be moved around, and the layout will be saved.
 
 ### 4. **Resize Divs**
+
 - Both the custom containers and editable divs are resizable. Simply drag the bottom-right corner to adjust the size.
 
 ### 5. **Delete Editable Divs**
+
 - Each editable div has a delete button (red icon in the top-right corner). Clicking the button will remove the div from the container.
 
 ### 6. **Delete All Divs**
+
 - The **Delete All** button on the sidebar allows you to delete all editable divs and custom containers. A confirmation prompt will appear before deletion.
 
 ### 7. **Autosave**
+
 - All changes, such as text edits, resizing, and movements, are automatically saved in the browser's **localStorage**. When you reload the page, the layout and content of the containers and divs will be restored.
 
 ### 8. **Toggle Sidebar**
+
 - The sidebar can be collapsed or expanded by clicking the toggle button. The sidebar will shrink to a minimal width, showing just icons, when collapsed.
 
 ## Installation
@@ -56,19 +73,23 @@ To use this application, simply download or copy the HTML file and open it in an
 ## Code Explanation
 
 ### HTML Structure
+
 - **Sidebar**: Contains buttons to create editable divs, custom containers, and delete all elements.
 - **Main Content Area**: Displays the custom containers, which can hold the editable divs.
 
 ### CSS Styling
+
 - Styles are included for creating a flexible layout, responsive design, and making the divs resizable and draggable.
 - The sidebar and main content area are styled to provide an intuitive user experience.
 
 ### JavaScript
+
 - **Drag-and-Drop**: The application supports drag-and-drop functionality using native HTML5 Drag and Drop API.
 - **Autosave**: The state of the containers and editable divs is saved in the browser’s **localStorage**.
 - **Event Listeners**: Listeners are added for drag events, content edit events, and button clicks to ensure a smooth user experience.
 
 ### Functions
+
 - **`saveState()`**: Saves the current layout, content, and size of the containers and editable divs to localStorage.
 - **`loadState()`**: Loads the saved layout from localStorage on page load and restores it.
 - **`createEditableDiv()`**: Creates a new editable div that can be dragged, edited, and resized.

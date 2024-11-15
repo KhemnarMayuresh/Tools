@@ -2,7 +2,10 @@
 
 This is a simple web-based version of the "Passing the Parcel" game, where players pass a virtual parcel around while music plays. The music will stop randomly within a specified time range. The game includes an audio file upload, configurable time settings, and buttons to start, stop, and reset the game.
 
-Live URL: 
+## Live URL: 
+#### Option 1: From [htmlpreview.github.io](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Passing%20the%20Parcel%20Game/PassingTheParcel.html)
+
+#### Option 1: From [rawcdn.githack.com](https://rawcdn.githack.com/KhemnarMayuresh/Tools/d63d03564fb59a87508e3c5a153a23b9316b66d7/Passing%20the%20Parcel%20Game/PassingTheParcel.html)
 
 
 ## Features
