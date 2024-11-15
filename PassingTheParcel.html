@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passing the Parcel Game</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body and Container */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            text-align: center;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: max-content;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+
+        /* Input Styles */
+        input[type="file"] {
+            margin: 15px 0;
+            padding: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+            background-color: #eee;
+            border-radius: 5px;
+        }
+
+        .text-field {
+            width: 100px;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            color: #333;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .text-field:focus {
+            border-color: #4a90e2;
+        }
+
+        /* Button Styles */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 12px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+
+        #startBtn {
+            background-color: #28a745;
+        }
+        #startBtn:hover {
+            background-color: #218838;
+        }
+
+        #stopBtn {
+            background-color: #dc3545;
+        }
+        #stopBtn:hover {
+            background-color: #c82333;
+        }
+
+        #resetBtn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        #resetBtn:hover {
+            background-color: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Passing the Parcel Game</h1>
+        
+        <input type="file" id="audioInput" accept="audio/*">
+        
+        <div>
+            <label>Min Time (seconds):</label>
+            <input type="number" id="minTime" class="text-field" value="10" min="1">
+        </div>
+
+        <div>
+            <label>Max Time (seconds):</label>
+            <input type="number" id="maxTime" class="text-field" value="30" min="1">
+        </div>
+
+        <div class="button-container">
+            <button id="startBtn">Start</button>
+            <button id="stopBtn">Stop</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" hidden></audio>
+
+    <script>
+        const audioInput = document.getElementById('audioInput');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const minTimeInput = document.getElementById('minTime');
+        const maxTimeInput = document.getElementById('maxTime');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        let stopTimeout;
+
+        audioInput.addEventListener('change', () => {
+            const file = audioInput.files[0];
+            if (file) {
+                audioPlayer.src = URL.createObjectURL(file);
+                audioPlayer.load();
+            }
+        });
+
+        // Function to validate and adjust min and max time values
+        function validateTimeInputs() {
+            const minTime = parseInt(minTimeInput.value);
+            const maxTime = parseInt(maxTimeInput.value);
+
+            // Adjust maxTime if it is less than or equal to minTime
+            if (maxTime <= minTime) {
+                maxTimeInput.value = minTime + 1;
+            }
+        }
+
+        // Event listeners for validation on input change
+        minTimeInput.addEventListener('input', validateTimeInputs);
+        maxTimeInput.addEventListener('input', validateTimeInputs);
+
+        startBtn.addEventListener('click', () => {
+            const minTime = parseInt(minTimeInput.value) * 1000;
+            const maxTime = parseInt(maxTimeInput.value) * 1000;
+
+            if (!audioPlayer.src) {
+                alert('Please select an audio file.');
+                return;
+            }
+
+            if (minTime >= maxTime) {
+                alert('Min time must be less than Max time.');
+                return;
+            }
+
+            audioPlayer.play();
+
+            const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+            stopTimeout = setTimeout(() => {
+                audioPlayer.pause();
+            }, randomTime);
+        });
+
+        stopBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            clearTimeout(stopTimeout);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            clearTimeout(stopTimeout);
+            minTimeInput.value = 10;
+            maxTimeInput.value = 30;
+            audioInput.value = null;
+            audioPlayer.src = '';
+        });
+    </script>
+</body>
+</html>
