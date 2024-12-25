@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Second Drawing Game</title>
+    <style>
+        /* General body and layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px 30px 20px 20px;
+            padding: 5px;
+            background-color: #f2f2f2;
+            height: 100vh;
+        }
+
+        h1 {
+            margin: 5px;
+        }
+
+        /* Cards */
+        .cards {
+            text-align: left;
+            background: #ffffff;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        /* Toggle button */
+        .toggle-btn {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Category section */
+        .settings {
+            text-align: left;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        .category {
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+            flex: 1 1 calc(25% - 20px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Adjust layout of the checkbox and label */
+        .category-header {
+            display: flex;
+            align-items: center;
+            /* Align checkbox and label on the same line */
+        }
+
+        .category-header input {
+            margin-right: 10px;
+            /* Space between checkbox and label */
+        }
+
+        .names {
+            margin-left: 20px;
+        }
+
+        /* Category name items */
+        .name-item {
+            display: flex;
+            align-items: center;
+            /* Align checkbox and label on the same line */
+            margin-bottom: 5px;
+        }
+
+        .name-item input {
+            margin-right: 10px;
+            /* Space between checkbox and label */
+        }
+
+        .text-field {
+            width: 100px;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            color: #333;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .text-field:focus {
+            border-color: #4a90e2;
+        }
+
+        /* Button styles */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+
+        #startButton {
+            background-color: #28a745;
+        }
+
+        #startButton:hover {
+            background-color: #218838;
+        }
+
+        #startButton:disabled {
+            background-color: #565a57;
+        }
+
+        #resetBtn {
+            background-color: #ff0707;
+            padding: 8px 30px;
+            margin-bottom: 5px;
+        }
+
+        #resetBtn:hover {
+            background-color: #e00000;
+        }
+
+        /* Timer and word display */
+        #word {
+            font-size: 5rem;
+            font-weight: bold;
+            color: red;
+        }
+
+        #timer {
+            font-size: 2rem;
+        }
+
+        /* Centering the image */
+        #imageDisplay {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #imageDisplay img {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Ensure the hidden class is defined to hide elements */
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .categories {
+                justify-content: center;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            #word {
+                font-size: 3rem;
+            }
+
+            #timer {
+                font-size: 1.5rem;
+            }
+
+            #imageDisplay img {
+                max-width: 80%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #word {
+                font-size: 2.5rem;
+            }
+
+            #timer {
+                font-size: 1.2rem;
+            }
+
+            .category {
+                flex: 1 1 100%;
+            }
+
+            .name-item {
+                font-size: 0.9rem;
+            }
+
+            button {
+                font-size: 0.9rem;
+            }
+
+            .text-field {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>30 Second Drawing Game</h1>
+
+        <!-- Instructions Section -->
+        <div class="cards" id="instructions">
+            <h2>
+                How to Play
+                <button id="toggleInstructions" class="toggle-btn">Show</button>
+            </h2>
+            <ol id="instructionsContent" style="display: none;">
+                <li>A word or name will be shown to draw. (Example: Icecream, Iron Man)</li>
+                <li>A timer for the selected time range (default: 30 seconds) starts on the "Go" button click.</li>
+                <li>All players must draw the word within the time limit. Stop drawing when the timer ends.</li>
+                <li>After the time is up, compare drawings and vote on the best one. The winner gets one point.</li>
+                <li>The first player to get the most points wins!</li>
+            </ol>
+        </div>
+
+        <!-- Category Selection -->
+        <div class="cards" id="settings">
+            <h2>
+                Settings
+                <button id="toggleCategorySection" class="toggle-btn">Hide</button>
+            </h2>
+            <button id="resetBtn">Reset</button>
+            <b style="color: red;">
+                <input type="checkbox" id="showReferenceImage"><label for="showReferenceImage">Show Reference Image all
+                    Time</label>
+                <input type="checkbox" id="sendAlertMag"><label for="sendAlertMag">Show Alert Messages</label>
+            </b>
+            <div id="settingsContent">
+                <div class="categories">
+
+                </div>
+                <br />
+                <label for="timeTime">Time Range (seconds):</label>
+                <input type="number" id="timeTime" class="text-field" value="30" max="120" min="10">
+            </div>
+        </div>
+
+        <!-- Time Selection and Start Button -->
+        <div class="cards">
+            <div class="button-container">
+                <button id="startButton">Go</button>
+            </div>
+        </div>
+
+        <!-- Word and Timer Display -->
+        <div class="cards" style="text-align: center;">
+            <div id="word" class="hidden"></div>
+            <div id="timer" class="hidden"></div>
+
+            <!-- Image Display after timer -->
+            <div id="imageDisplay" class="hidden"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Categories data
+        const data = [
+            // Marvel Category
+            { name: "Iron Man", imageUrl: "images/Iron Man.jpg", category: "Marvel" },
+            { name: "Captain America", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "SpiderMan", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Deadpool", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Thor", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Hulk", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Black Widow", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Ant Man", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Dr. Strange", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Hawkeye", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Black Panther", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Wanda Maximoff", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Loki", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Thanos", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Wolverine", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+
+            // DC Category
+            { name: "Batman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+            { name: "Superman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+            { name: "Wonder Woman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+            { name: "Flash", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+            { name: "Aquaman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+            { name: "Joker", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+
+            // Doremon Category
+            { name: "Doremon", imageUrl: "https://example.com/doremon.jpg", category: "Doremon" },
+            { name: "Nobita", imageUrl: "https://example.com/nobita.jpg", category: "Doremon" },
+            { name: "Shizuka", imageUrl: "https://example.com/shizuka.jpg", category: "Doremon" },
+            { name: "Suneo", imageUrl: "https://example.com/suneo.jpg", category: "Doremon" },
+            { name: "Gian", imageUrl: "https://example.com/gian.jpg", category: "Doremon" },
+
+            // Shinchan Category
+            { name: "Shinchan", imageUrl: "https://example.com/shinchan.jpg", category: "Shinchan" },
+            { name: "Mikey", imageUrl: "https://example.com/mikey.jpg", category: "Shinchan" },
+            { name: "Nina", imageUrl: "https://example.com/nina.jpg", category: "Shinchan" },
+            { name: "Hiroshi", imageUrl: "https://example.com/hiroshi.jpg", category: "Shinchan" },
+            { name: "Misae", imageUrl: "https://example.com/misae.jpg", category: "Shinchan" },
+
+            // Chota Bheem Category
+            { name: "Chota Bheem", imageUrl: "https://example.com/chota-bheem.jpg", category: "Chota Bheem" },
+            { name: "Chutki", imageUrl: "https://example.com/chutki.jpg", category: "Chota Bheem" },
+            { name: "Raju", imageUrl: "https://example.com/raju.jpg", category: "Chota Bheem" },
+            { name: "Jaggu", imageUrl: "https://example.com/jaggu.jpg", category: "Chota Bheem" },
+            { name: "Kalia", imageUrl: "https://example.com/kalia.jpg", category: "Chota Bheem" },
+
+            // Indian Category
+            { name: "Shaktimaan", imageUrl: "https://example.com/chota-bheem.jpg", category: "Indian Characters" },
+            { name: "Krish", imageUrl: "https://example.com/chutki.jpg", category: "Indian Characters" },
+            { name: "Modi Ji", imageUrl: "https://example.com/chutki.jpg", category: "Indian Characters" },
+            { name: "Dhoni", imageUrl: "https://example.com/chutki.jpg", category: "Indian Characters" },
+            { name: "Salman", imageUrl: "https://example.com/chutki.jpg", category: "Indian Characters" },
+            { name: "Sharukh", imageUrl: "https://example.com/chutki.jpg", category: "Indian Characters" },
+
+            // Demon Slayer Characters
+            { name: "Tanjiro Kamado", imageUrl: "https://example.com/tanjiro.jpg", category: "Demon Slayer" },
+            { name: "Nezuko Kamado", imageUrl: "https://example.com/nezuko.jpg", category: "Demon Slayer" },
+            { name: "Zenitsu Agatsuma", imageUrl: "https://example.com/zenitsu.jpg", category: "Demon Slayer" },
+
+
+            // Pokémon Characters
+            { name: "Pikachu", imageUrl: "https://example.com/pikachu.jpg", category: "Pokémon" },
+            { name: "Ash Ketchum", imageUrl: "https://example.com/ash.jpg", category: "Pokémon" },
+            { name: "Misty", imageUrl: "https://example.com/misty.jpg", category: "Pokémon" },
+            { name: "Brock", imageUrl: "https://example.com/brock.jpg", category: "Pokémon" },
+
+            // Scooby-Doo Characters
+            { name: "Scooby-Doo", imageUrl: "https://example.com/scooby.jpg", category: "Scooby-Doo" },
+            { name: "Shaggy", imageUrl: "https://example.com/shaggy.jpg", category: "Scooby-Doo" },
+            { name: "Velma", imageUrl: "https://example.com/velma.jpg", category: "Scooby-Doo" },
+            { name: "Daphne", imageUrl: "https://example.com/daphne.jpg", category: "Scooby-Doo" },
+            { name: "Fred", imageUrl: "https://example.com/fred.jpg", category: "Scooby-Doo" },
+
+            // Powerpuff Girls Characters
+            { name: "Blossom", imageUrl: "https://example.com/blossom.jpg", category: "Powerpuff Girls" },
+            { name: "Bubbles", imageUrl: "https://example.com/bubbles.jpg", category: "Powerpuff Girls" },
+            { name: "Buttercup", imageUrl: "https://example.com/buttercup.jpg", category: "Powerpuff Girls" },
+
+            // Ben 10 Characters
+            { name: "Ben Tennyson", imageUrl: "https://example.com/ben.jpg", category: "Ben 10" },
+            { name: "Gwen Tennyson", imageUrl: "https://example.com/gwen.jpg", category: "Ben 10" },
+            { name: "Kevin Levin", imageUrl: "https://example.com/kevin.jpg", category: "Ben 10" },
+
+            // Naruto Characters
+            { name: "Naruto Uzumaki", imageUrl: "https://example.com/naruto.jpg", category: "Naruto" },
+            { name: "Sasuke Uchiha", imageUrl: "https://example.com/sasuke.jpg", category: "Naruto" },
+            { name: "Sakura Haruno", imageUrl: "https://example.com/sakura.jpg", category: "Naruto" },
+
+            // Dragon Ball Z Characters
+            { name: "Goku", imageUrl: "https://example.com/goku.jpg", category: "Dragon Ball Z" },
+            { name: "Vegeta", imageUrl: "https://example.com/vegeta.jpg", category: "Dragon Ball Z" },
+            { name: "Gohan", imageUrl: "https://example.com/gohan.jpg", category: "Dragon Ball Z" },
+            { name: "Piccolo", imageUrl: "https://example.com/piccolo.jpg", category: "Dragon Ball Z" },
+
+            // One Piece Characters
+            { name: "Monkey D. Luffy", imageUrl: "https://example.com/luffy.jpg", category: "One Piece" },
+            { name: "Roronoa Zoro", imageUrl: "https://example.com/zoro.jpg", category: "One Piece" },
+            { name: "Nami", imageUrl: "https://example.com/nami.jpg", category: "One Piece" },
+
+            // Attack on Titan Characters
+            { name: "Eren Yeager", imageUrl: "https://example.com/eren.jpg", category: "Attack on Titan" },
+            { name: "Mikasa Ackerman", imageUrl: "https://example.com/mikasa.jpg", category: "Attack on Titan" },
+            { name: "Armin Arlert", imageUrl: "https://example.com/armin.jpg", category: "Attack on Titan" },
+
+            // Death Note Characters
+            { name: "Light Yagami", imageUrl: "https://example.com/light.jpg", category: "Death Note" },
+            { name: "L", imageUrl: "https://example.com/l.jpg", category: "Death Note" },
+            { name: "Ryuk", imageUrl: "https://example.com/ryuk.jpg", category: "Death Note" },
+
+            // My Hero Academia Characters
+            { name: "Izuku Midoriya", imageUrl: "https://example.com/midoriya.jpg", category: "My Hero Academia" },
+            { name: "Katsuki Bakugo", imageUrl: "https://example.com/bakugo.jpg", category: "My Hero Academia" },
+            { name: "Shoto Todoroki", imageUrl: "https://example.com/todoroki.jpg", category: "My Hero Academia" }
+        ];
+
+        // Organize categories
+        const categories = data.reduce((acc, { name, category, imageUrl }) => {
+            if (!acc[category]) acc[category] = [];
+            acc[category].push({ name, imageUrl });
+            return acc;
+        }, {});
+
+        // Create category checkboxes
+        // Function to create category checkboxes and select all logic
+        function createCategoryCheckbox(category, names) {
+            const container = document.createElement('div');
+            container.className = 'category';
+
+            const header = document.createElement('div');
+            header.className = 'category-header';
+
+            const categoryCheckbox = document.createElement('input');
+            categoryCheckbox.type = 'checkbox';
+            categoryCheckbox.id = category;
+
+            const label = document.createElement('label');
+            label.htmlFor = category;
+            label.textContent = category;
+
+            // Listen for category checkbox change
+            categoryCheckbox.addEventListener('change', (event) => {
+                // Select or unselect all name checkboxes based on category checkbox state
+                const nameCheckboxes = container.querySelectorAll('.name-item input');
+                nameCheckboxes.forEach(checkbox => {
+                    checkbox.checked = event.target.checked;
+                });
+            });
+
+            header.appendChild(categoryCheckbox);
+            header.appendChild(label);
+            container.appendChild(header);
+
+            // Names list
+            const namesContainer = document.createElement('div');
+            namesContainer.className = 'names';
+
+            names.forEach(item => {
+                const nameContainer = document.createElement('div');
+                nameContainer.className = 'name-item';
+
+                const nameCheckbox = document.createElement('input');
+                nameCheckbox.type = 'checkbox';
+                nameCheckbox.id = item.name;
+
+                const nameLabel = document.createElement('label');
+                nameLabel.htmlFor = item.name;
+                nameLabel.textContent = item.name;
+
+                // Add event listener to check if the name is selected
+                nameCheckbox.addEventListener('change', () => {
+                    // Check if any name checkbox is selected in the category
+                    const categoryCheckbox = document.getElementById(category);
+                    const nameCheckboxes = container.querySelectorAll('.name-item input');
+
+                    // If any name is checked, check the category checkbox
+                    categoryCheckbox.checked = Array.from(nameCheckboxes).some(checkbox => checkbox.checked);
+                });
+
+                nameContainer.appendChild(nameCheckbox);
+                nameContainer.appendChild(nameLabel);
+                namesContainer.appendChild(nameContainer);
+            });
+
+            container.appendChild(namesContainer);
+            return container;
+        }
+
+        window.onload = () => {
+            const root = document.querySelector('.categories');
+            Object.keys(categories).forEach(category => {
+                const names = categories[category];
+                const categoryCheckbox = createCategoryCheckbox(category, names);
+                root.appendChild(categoryCheckbox);
+            });
+        };
+
+        // Timer and word management
+        const timeTimeInput = document.getElementById('timeTime');
+        const startButton = document.getElementById('startButton');
+        const timerElement = document.getElementById("timer");
+        const wordElement = document.getElementById("word");
+        const imageDisplay = document.getElementById("imageDisplay");
+        const resetBtn = document.getElementById('resetBtn');
+        let displayedNames = [];  // Track displayed names
+
+        resetBtn.addEventListener("click", () => {
+            displayedNames = [];
+            resetGame(); // Reset game state
+        });
+
+        // Start button event listener
+        startButton.addEventListener("click", () => {
+
+            resetGame(); // Reset game state
+
+            // Step 1: Get all checked categories
+            const selectedCategories = [];
+            const categoryCheckboxes = document.querySelectorAll('.category-header input[type="checkbox"]');
+            categoryCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedCategories.push(checkbox.id); // Save the category name
+                }
+            });
+
+            // Step 2: Get checked names under the selected categories
+            const selectedNames = [];
+            selectedCategories.forEach(category => {
+                const categoryContainer = document.querySelector(`#${category}`).closest('.category');
+                const nameCheckboxes = categoryContainer.querySelectorAll('.name-item input[type="checkbox"]');
+
+                nameCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const name = checkbox.id;
+                        const imageUrl = data.find(item => item.name === name).imageUrl; // Get the image URL
+                        selectedNames.push({ name, imageUrl }); // Save name and image URL
+                    }
+                });
+            });
+
+            // Step 3: Randomly select a name from the selected names
+            if (selectedNames.length > 0) {
+                // Filter out already displayed names
+                const availableNames = selectedNames.filter(item => !displayedNames.includes(item.name));
+
+                if (availableNames.length > 0) {
+                    // Select a random name from the available names
+                    const randomNameData = availableNames[Math.floor(Math.random() * availableNames.length)];
+                    const randomName = randomNameData.name;
+                    const randomImageUrl = randomNameData.imageUrl;
+
+                    // Add this name to the displayed list to avoid repeating
+                    displayedNames.push(randomName);
+
+                    // Display the random name
+                    wordElement.textContent = randomName;
+                    wordElement.classList.remove("hidden");
+                    timerElement.classList.remove("hidden");
+
+                    // Disable the Go button and start the timer with countdown sequence
+                    startButton.disabled = true;
+
+                    // Show "Ready", "Set", "Go" countdown first
+                    countdownSequence(randomImageUrl, randomName);
+                } else {
+                    alert("All available names have been drawn. Please select new ones or reset from settings to start agin.");
+                }
+            } else {
+                alert("Please select at least one name from the categories.");
+            }
+        });
+
+        // Reset displayed names when categories change
+        document.querySelectorAll('.category-header input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                displayedNames = [];  // Clear displayed names when categories are updated
+            });
+        });
+
+
+        // Function to toggle visibility and button text
+        function toggleVisibility(buttonId, sectionId) {
+            const section = document.getElementById(sectionId);
+            const button = document.getElementById(buttonId);
+
+            if (section.style.display === "none") {
+                section.style.display = "block";
+                button.textContent = "Hide";
+            } else {
+                section.style.display = "none";
+                button.textContent = "Show";
+            }
+        }
+
+        // Toggle category section visibility
+        document.getElementById("toggleCategorySection").addEventListener("click", () => {
+            toggleVisibility("toggleCategorySection", "settingsContent");
+        });
+
+        // Toggle instructions visibility
+        document.getElementById("toggleInstructions").addEventListener("click", () => {
+            toggleVisibility("toggleInstructions", "instructionsContent");
+        });
+
+        // Countdown sequence (Ready, Set, Go)
+        function countdownSequence(imageUrl, name) {
+            const countdownMessages = ["Ready", "Set", "Go"];
+            let count = 0;
+
+            const countdownInterval = setInterval(() => {
+                if (count < countdownMessages.length) {
+                    timerElement.textContent = countdownMessages[count];
+                    count++;
+                } else {
+                    clearInterval(countdownInterval);
+                    // Disable the Go button and start the timer
+                    const timeRange = parseInt(timeTimeInput.value);
+                    startTimer(timeRange, imageUrl, name);  // Start the 10-second timer
+                }
+            }, 1000);
+        }
+
+        // Timer function with image display
+        function startTimer(duration, imageUrl, name) {
+            let timeLeft = duration;
+            timerElement.textContent = timeLeft;
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time's up! Compare your drawings and vote for the best one.");
+
+                    timerElement.classList.add("hidden");
+                    // Display the image after the timer ends
+                    displayImage(imageUrl, name);
+                }
+            }, 1000);
+        }
+
+        // Function to display the image
+        function displayImage(imageUrl, name) {
+            timerElement.classList.add("hidden");
+            timerElement.classList.add("hidden");
+            imageDisplay.classList.remove("hidden");
+
+            const imageElement = document.createElement('img');
+            imageElement.src = imageUrl;
+            imageElement.alt = name;
+
+            imageDisplay.innerHTML = ''; // Clear any previous image
+            imageDisplay.appendChild(imageElement);
+
+            // Disable the Go button and start the timer with countdown sequence
+            startButton.disabled = false;
+        }
+
+        // Reset game state
+        function resetGame() {
+            timerElement.textContent = "";
+            timerElement.classList.add("hidden");
+            startButton.disabled = false; // Re-enable the Go button
+        }
+
+    </script>
+</body>
+
+</html>
