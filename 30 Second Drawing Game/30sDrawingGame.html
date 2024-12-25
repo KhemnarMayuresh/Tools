@@ -15,10 +15,6 @@
             height: 100vh;
         }
 
-        h1 {
-            margin: 5px;
-        }
-
         /* Cards */
         .cards {
             text-align: left;
@@ -274,7 +270,7 @@
             <b style="color: red;">
                 <input type="checkbox" id="showReferenceImage"><label for="showReferenceImage">Show Reference Image all
                     Time</label>
-                <input type="checkbox" id="sendAlertMag"><label for="sendAlertMag">Show Alert Messages</label>
+                <input type="checkbox" id="sendAlertMag" checked><label for="sendAlertMag">Show Alert Messages</label>
             </b>
             <div id="settingsContent">
                 <div class="categories">
@@ -282,7 +278,7 @@
                 </div>
                 <br />
                 <label for="timeTime">Time Range (seconds):</label>
-                <input type="number" id="timeTime" class="text-field" value="30" max="120" min="10">
+                <input type="number" id="timeTime" class="text-field" value="30" max="120" min="1">
             </div>
         </div>
 
@@ -308,44 +304,52 @@
         // Categories data
         const data = [
             // Marvel Category
-            { name: "Iron Man", imageUrl: "images/Iron Man.jpg", category: "Marvel" },
-            { name: "Captain America", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "SpiderMan", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Deadpool", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Thor", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Hulk", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Black Widow", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Ant Man", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Dr. Strange", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Hawkeye", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Black Panther", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Wanda Maximoff", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Loki", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Thanos", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
-            { name: "Wolverine", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "Marvel" },
+            { name: "Iron Man", imageUrl: "./imagesIron_Man.jpg", category: "Marvel" },
+            { name: "Captain America", imageUrl: "./images/Captain_America.jpg", category: "Marvel" },
+            { name: "SpiderMan", imageUrl: "./images/SpiderMan.png", category: "Marvel" },
+            { name: "Deadpool", imageUrl: "./images/Deadpool.png", category: "Marvel" },
+            { name: "Thor", imageUrl: "./images/Thor.png", category: "Marvel" },
+            { name: "Hulk", imageUrl: "./images/Hulk.jpg", category: "Marvel" },
+            { name: "Black Widow", imageUrl: "./images/Black Widow.png", category: "Marvel" },
+            { name: "Ant Man", imageUrl: "./images/Ant Man.png", category: "Marvel" },
+            { name: "Dr. Strange", imageUrl: "./images/Doctor-Strange.png", category: "Marvel" },
+            { name: "Hawkeye", imageUrl: "./images/Hawkeye.png", category: "Marvel" },
+            { name: "Black Panther", imageUrl: "./images/Black Panther.jpg", category: "Marvel" },
+            { name: "Wanda Maximoff", imageUrl: "./images/Wanda Maximoff.png", category: "Marvel" },
+            { name: "Loki", imageUrl: "./images/Loki.png", category: "Marvel" },
+            { name: "Thanos", imageUrl: "./images/Thanos.png", category: "Marvel" },
+            { name: "Wolverine", imageUrl: "./images/Wolverine.png", category: "Marvel" },
 
             // DC Category
-            { name: "Batman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
-            { name: "Superman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
-            { name: "Wonder Woman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
-            { name: "Flash", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
-            { name: "Aquaman", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
-            { name: "Joker", imageUrl: "https://i.ytimg.com/vi/YGoqrX22rXs/maxresdefault.jpg", category: "DC" },
+            { name: "Batman", imageUrl: "./images/Batman.png", category: "DC" },
+            { name: "Superman", imageUrl: "./images/Superman.png", category: "DC" },
+            { name: "Wonder Woman", imageUrl: "./images/Wonder Women.png", category: "DC" },
+            { name: "Flash", imageUrl: "./images/Flash.jpg", category: "DC" },
+            { name: "Aquaman", imageUrl: "./images/Aquaman.png", category: "DC" },
+            { name: "Joker", imageUrl: "./images/Joker.png", category: "DC" },
 
-            // Doremon Category
-            { name: "Doremon", imageUrl: "https://example.com/doremon.jpg", category: "Doremon" },
-            { name: "Nobita", imageUrl: "https://example.com/nobita.jpg", category: "Doremon" },
-            { name: "Shizuka", imageUrl: "https://example.com/shizuka.jpg", category: "Doremon" },
-            { name: "Suneo", imageUrl: "https://example.com/suneo.jpg", category: "Doremon" },
-            { name: "Gian", imageUrl: "https://example.com/gian.jpg", category: "Doremon" },
+            // Doraemon  Category
+            { name: "Doraemon ", imageUrl: "./images/Doraemon.png", category: "Doraemon" },
+            { name: "Nobita", imageUrl: "./images/Nobita.png", category: "Doraemon" },
+            { name: "Shizuka", imageUrl: "./images/Shizuka.png", category: "Doraemon" },
+            { name: "Suneo", imageUrl: "./images/Suneo.jpg", category: "Doraemon" },
+            { name: "Gian", imageUrl: "./images/Gian.png", category: "Doraemon" },
+            { name: "Dorami", imageUrl: "./images/Dorami.png", category: "Doraemon" },
+            { name: "Dekisugi", imageUrl: "./images/Gian.png", category: "Doraemon" },
 
             // Shinchan Category
-            { name: "Shinchan", imageUrl: "https://example.com/shinchan.jpg", category: "Shinchan" },
-            { name: "Mikey", imageUrl: "https://example.com/mikey.jpg", category: "Shinchan" },
-            { name: "Nina", imageUrl: "https://example.com/nina.jpg", category: "Shinchan" },
-            { name: "Hiroshi", imageUrl: "https://example.com/hiroshi.jpg", category: "Shinchan" },
-            { name: "Misae", imageUrl: "https://example.com/misae.jpg", category: "Shinchan" },
+            { name: "Shinchan", imageUrl: "./images/Shinchan.png", category: "Shinchan" },
+            { name: "Hiroshi", imageUrl: "./images/Hiroshi.png", category: "Shinchan" },
+            { name: "Misae", imageUrl: "./images/Misae.png", category: "Shinchan" },
+            { name: "himawari", imageUrl: "./images/himawari.png", category: "Shinchan" },
+            { name: "Shiro", imageUrl: "./images/Shiro.png", category: "Shinchan" },
+            { name: "Ai Chan", imageUrl: "./images/Ai Chan.jpg", category: "Shinchan" },
+            { name: "Kazama", imageUrl: "./images/kazama.png", category: "Shinchan" },
+            { name: "Boo", imageUrl: "./images/boo.jpg", category: "Shinchan" },
+            { name: "Nene", imageUrl: "./images/Nene.jpg", category: "Shinchan" },
+            { name: "Masao ", imageUrl: "./images/masao.png", category: "Shinchan" },
 
+            // Mickey Mouse 
             // Chota Bheem Category
             { name: "Chota Bheem", imageUrl: "https://example.com/chota-bheem.jpg", category: "Chota Bheem" },
             { name: "Chutki", imageUrl: "https://example.com/chutki.jpg", category: "Chota Bheem" },
@@ -510,6 +514,8 @@
         const wordElement = document.getElementById("word");
         const imageDisplay = document.getElementById("imageDisplay");
         const resetBtn = document.getElementById('resetBtn');
+        const sendAlertMag = document.getElementById('sendAlertMag');
+        const showReferenceImage = document.getElementById('showReferenceImage');
         let displayedNames = [];  // Track displayed names
 
         resetBtn.addEventListener("click", () => {
@@ -564,6 +570,9 @@
                     wordElement.textContent = randomName;
                     wordElement.classList.remove("hidden");
                     timerElement.classList.remove("hidden");
+                    if(showReferenceImage.checked){
+                        displayImage(randomImageUrl, randomName);
+                    }
 
                     // Disable the Go button and start the timer with countdown sequence
                     startButton.disabled = true;
@@ -637,8 +646,9 @@
                 timerElement.textContent = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    alert("Time's up! Compare your drawings and vote for the best one.");
-
+                    if (sendAlertMag.checked) {
+                        alert("Time's up! Compare your drawings and vote for the best one.");
+                    }
                     timerElement.classList.add("hidden");
                     // Display the image after the timer ends
                     displayImage(imageUrl, name);
