@@ -10,9 +10,9 @@ This is a simple web-based version of the "30 Second Drawing" game.
 5. The first player to get a most number of points, wins!
 
 ## Live URL: 
-#### Option 1: From [htmlpreview.github.io](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Passing%20the%20Parcel%20Game/PassingTheParcel.html)
+#### Option 1: From [htmlpreview.github.io](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/30%20Second%20Drawing%20Game/30sDrawingGame.html)
 
-#### Option 1: From [rawcdn.githack.com](https://rawcdn.githack.com/KhemnarMayuresh/Tools/d63d03564fb59a87508e3c5a153a23b9316b66d7/Passing%20the%20Parcel%20Game/PassingTheParcel.html)
+#### Option 1: From [rawcdn.githack.com](https://rawcdn.githack.com/KhemnarMayuresh/Tools/blob/main/30%20Second%20Drawing%20Game/30sDrawingGame.html)
 
 
 ## Features
