@@ -10,12 +10,15 @@
         /* General body and layout */
         body {
             font-family: Arial, sans-serif;
-            margin: 20px 30px 20px 20px;
+            margin: 0px 30px 20px 20px;
             padding: 5px;
             background-color: #f2f2f2;
             height: 100vh;
         }
 
+        .container{
+            padding: 0 0 20px 0;
+        }
         /* Cards */
         .cards {
             text-align: left;
@@ -54,9 +57,18 @@
             width: 100%;
         }
 
+        .searchContainer {
+            width: 100%;
+        }
+
+        .searchContainer input {
+            width: 98%;
+            border: 1px solid black;
+        }
+
         .categories {
-            display: flex;
-            flex-wrap: wrap;
+            height: 50vh;
+            overflow-y: auto;
             gap: 10px;
             justify-content: flex-start;
         }
@@ -65,18 +77,13 @@
             padding: 10px;
             border-radius: 12px;
             border: 1px solid #ccc;
-            background: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             min-width: 150px;
-            flex: 1 1 calc(25% - 20px);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
         }
 
         /* Adjust layout of the checkbox and label */
         .category-header {
-            display: flex;
+            padding: 2px;
             align-items: center;
             /* Align checkbox and label on the same line */
         }
@@ -101,6 +108,16 @@
         .name-item input {
             margin-right: 10px;
             /* Space between checkbox and label */
+        }
+
+        .name-item .img-container {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        .name-item .img-container img {
+            max-width: 100%;
+            max-height: 100%;
         }
 
         .text-field {
@@ -152,13 +169,13 @@
             background-color: #565a57;
         }
 
-        #resetBtn {
+        #RestartBtn {
             background-color: #ff0707;
             padding: 8px 30px;
             margin-bottom: 5px;
         }
 
-        #resetBtn:hover {
+        #RestartBtn:hover {
             background-color: #e00000;
         }
 
@@ -170,6 +187,10 @@
         }
 
         #timer {
+            font-size: 2rem;
+        }
+
+        #readySetGo {
             font-size: 2rem;
         }
 
@@ -188,6 +209,64 @@
         /* Ensure the hidden class is defined to hide elements */
         .hidden {
             display: none;
+        }
+
+        /* Circular Countdown Progress Bar */
+        .countdown-container.circular {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+            fill: none;
+        }
+
+        .progress-circle circle {
+            stroke: #ddd;
+            stroke-width: 10;
+            r: 45;
+            cx: 50;
+            cy: 50;
+        }
+
+        .progress-circle .progress {
+            stroke: #3498db;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .circular-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        @keyframes animated-progress-bar {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0;
+            }
+        }
+
+        /* Timer Styles */
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 5px 0;
         }
 
         /* Responsive Design */
@@ -209,6 +288,10 @@
                 font-size: 1.5rem;
             }
 
+            #readySetGo {
+                font-size: 1.5rem;
+            }
+
             #imageDisplay img {
                 max-width: 80%;
             }
@@ -220,6 +303,10 @@
             }
 
             #timer {
+                font-size: 1.2rem;
+            }
+
+            #readySetGo {
                 font-size: 1.2rem;
             }
 
@@ -243,7 +330,6 @@
 </head>
 
 <body>
-
     <div class="container">
         <h1>30 Second Drawing Game</h1>
 
@@ -253,13 +339,19 @@
                 How to Play
                 <button id="toggleInstructions" class="toggle-btn">Show</button>
             </h2>
-            <ol id="instructionsContent" style="display: none;">
-                <li>A word or name will be shown to draw. (Example: Icecream, Iron Man)</li>
-                <li>A timer for the selected time range (default: 30 seconds) starts on the "Go" button click.</li>
-                <li>All players must draw the word within the time limit. Stop drawing when the timer ends.</li>
-                <li>After the time is up, compare drawings and vote on the best one. The winner gets one point.</li>
-                <li>The first player to get the most points wins!</li>
-            </ol>
+            <div id="instructionsContent" style="display: none;">
+                <ol>
+                    <li>A word or name will be shown to draw. (Example: Icecream, Iron Man)</li>
+                    <li>A timer for the selected time range (default: 30 seconds) starts on the "Go" button click.</li>
+                    <li>All players must draw the shown word within the time limit. Stop drawing when the timer ends.</li>
+                    <li>After the time is up, compare drawings and vote on the best one. The winner gets one point.</li>
+                    <li>The first player to get the most points wins!</li>
+                </ol>
+                <b style="margin-left: 20px;"><i>Notes:</i></b>
+                <ul>
+                    <li>Each one will only repeat once to draw. You can click on Restart button to start game again with same selection.</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Category Selection -->
@@ -268,19 +360,22 @@
                 Settings
                 <button id="toggleCategorySection" class="toggle-btn">Hide</button>
             </h2>
-            <button id="resetBtn">Reset</button>
-            <b style="color: red;">
+            <label for="timeTime">Time Range (seconds):</label>
+            <input type="number" id="timeTime" class="text-field" value="30" max="120" min="10">
+            <b style="color: red; margin:0 10px 0 10px">
                 <input type="checkbox" id="showReferenceImage"><label for="showReferenceImage">Show Reference Image all
                     Time</label>
                 <input type="checkbox" id="sendAlertMag" checked><label for="sendAlertMag">Show Alert Messages</label>
             </b>
+            <button id="RestartBtn">Restart</button>
             <div id="settingsContent">
-                <div class="categories">
-
+                <div class="searchContainer">
+                    <input type="text" id="searchBox" class="text-field"
+                        placeholder="Search for categories or names...">
                 </div>
-                <br />
-                <label for="timeTime">Time Range (seconds):</label>
-                <input type="number" id="timeTime" class="text-field" value="30" max="120" min="10">
+                <div class="categories">
+                    <!-- Dynamically populate this section with JS -->
+                </div>
             </div>
         </div>
 
@@ -292,10 +387,19 @@
         </div>
 
         <!-- Word and Timer Display -->
-        <div class="cards" style="text-align: center;">
+        <div class="cards" style="text-align: center; min-height: 50vh;">
             <div id="word" class="hidden"></div>
-            <div id="timer" class="hidden"></div>
-
+            <div id="readySetGo"></div>
+            <!-- Circular Countdown Progress Bar -->
+            <div class="countdown-container circular hidden" id="countdownTimer">
+                <svg class="progress-circle" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" />
+                    <circle class="progress" cx="50" cy="50" r="45" />
+                </svg>
+                <div class="circular-timer" id="circular-timer">
+                    <div id="timer" class="hidden"></div>
+                </div>
+            </div>
             <!-- Image Display after timer -->
             <div id="imageDisplay" class="hidden"></div>
         </div>
@@ -382,19 +486,19 @@
             { name: "Nezuko Kamado", imageUrl: "./images/nezuko.jpg", category: "Demon_Slayer" },
             { name: "Zenitsu Agatsuma", imageUrl: "./images/Zenitsu.png", category: "Demon_Slayer" },
             { name: "Inosuke Hashibira", imageUrl: "./images/Inosuke.png", category: "Demon_Slayer" },
-            { name: "Muzan", imageUrl: "./images/Muzan.png", category: "Demon_Slayer" }, 
+            { name: "Muzan", imageUrl: "./images/Muzan.png", category: "Demon_Slayer" },
             // { name: "Muzan 2", imageUrl: "./images/muzan.jpg", category: "Demon_Slayer" }, 
-            { name: "Akaza", imageUrl: "./images/Akaza.png", category: "Demon_Slayer" }, 
-            { name: "Rengoku", imageUrl: "./images/Rengoku.png", category: "Demon_Slayer" }, 
-            { name: "Muichiro Tokito", imageUrl: "./images/Muichiro_Tokito.png", category: "Demon_Slayer" }, 
-            { name: "Tengen Uzui", imageUrl: "./images/Tengen Uzui.jpg", category: "Demon_Slayer" }, 
-            { name: "Obanai Iguro", imageUrl: "./images/Obanai Iguro.jpg", category: "Demon_Slayer" }, 
-            { name: "Mitsuri Kanroji", imageUrl: "./images/Mitsuri Kanroji.png", category: "Demon_Slayer" }, 
-            { name: "Giyu Tomioka", imageUrl: "./images/Giyu Tomioka.png", category: "Demon_Slayer" }, 
-            { name: "Sanemi Shinazugawa", imageUrl: "./images/Sanemi Shinazugawa.jpeg", category: "Demon_Slayer" }, 
-            { name: "Gyomei Himejima", imageUrl: "./images/Gyomei Himejima.png", category: "Demon_Slayer" }, 
-            { name: "Shinobu Kocho", imageUrl: "./images/Shinobu Kocho.png", category: "Demon_Slayer" }, 
-            { name: "Kanae Kocho", imageUrl: "./images/Kanae Kocho.jpg", category: "Demon_Slayer" }, 
+            { name: "Akaza", imageUrl: "./images/Akaza.png", category: "Demon_Slayer" },
+            { name: "Rengoku", imageUrl: "./images/Rengoku.png", category: "Demon_Slayer" },
+            { name: "Muichiro Tokito", imageUrl: "./images/Muichiro_Tokito.png", category: "Demon_Slayer" },
+            { name: "Tengen Uzui", imageUrl: "./images/Tengen Uzui.jpg", category: "Demon_Slayer" },
+            { name: "Obanai Iguro", imageUrl: "./images/Obanai Iguro.jpg", category: "Demon_Slayer" },
+            { name: "Mitsuri Kanroji", imageUrl: "./images/Mitsuri Kanroji.png", category: "Demon_Slayer" },
+            { name: "Giyu Tomioka", imageUrl: "./images/Giyu Tomioka.png", category: "Demon_Slayer" },
+            { name: "Sanemi Shinazugawa", imageUrl: "./images/Sanemi Shinazugawa.jpeg", category: "Demon_Slayer" },
+            { name: "Gyomei Himejima", imageUrl: "./images/Gyomei Himejima.png", category: "Demon_Slayer" },
+            { name: "Shinobu Kocho", imageUrl: "./images/Shinobu Kocho.png", category: "Demon_Slayer" },
+            { name: "Kanae Kocho", imageUrl: "./images/Kanae Kocho.jpg", category: "Demon_Slayer" },
 
             // Pokémon Characters
             { name: "Pikachu", imageUrl: "./images/Pikachu.jpg", category: "Pokémon" },
@@ -459,7 +563,7 @@
             { name: "Light Yagami", imageUrl: "./images/Light Yagami.png", category: "Death_Note" },
             { name: "L", imageUrl: "./images/L.png", category: "Death_Note" },
             { name: "Ryuk", imageUrl: "./images/Ryuk.jpeg", category: "Death_Note" },
-            
+
             // jujutsu kaisen Characters
             { name: "Satoru Gojo", imageUrl: "./images/satoru gojo.png", category: "Jujutsu_Kaisen" },
             { name: "Suguru Geto", imageUrl: "./images/Suguru Geto.png", category: "Jujutsu_Kaisen" },
@@ -535,13 +639,13 @@
                 nameLabel.textContent = item.name;
 
                 // Image
+                const nameimgContainer = document.createElement('div');
+                nameimgContainer.className = 'img-container';
                 const imageElement = document.createElement('img');
                 imageElement.src = item.imageUrl;
                 imageElement.alt = item.name;
-                imageElement.style.maxWidth = "40px"; // Set image size to 25px
-                imageElement.style.maxHeight = "40px"; // Set image size to 25px
-
-                nameContainer.appendChild(imageElement);
+                nameimgContainer.appendChild(imageElement);
+                nameContainer.appendChild(nameimgContainer);
 
                 // Add event listener to check if the name is selected
                 nameCheckbox.addEventListener('change', () => {
@@ -575,14 +679,21 @@
         const timeTimeInput = document.getElementById('timeTime');
         const startButton = document.getElementById('startButton');
         const timerElement = document.getElementById("timer");
+        const readySetGo = document.getElementById("readySetGo");
         const wordElement = document.getElementById("word");
         const imageDisplay = document.getElementById("imageDisplay");
-        const resetBtn = document.getElementById('resetBtn');
+        const RestartBtn = document.getElementById('RestartBtn');
         const sendAlertMag = document.getElementById('sendAlertMag');
         const showReferenceImage = document.getElementById('showReferenceImage');
+        // Circular Countdown Timer
+        const countdownTimer = document.getElementById('countdownTimer');
+        const circularBar = document.querySelector('.progress-circle .progress');
+        // Set initial progress bar to 100%
+        const circumference = 2 * Math.PI * 45; // Circle radius is 45
+        circularBar.style.strokeDashoffset = 0; // Set full stroke initially
         let displayedNames = [];  // Track displayed names
 
-        resetBtn.addEventListener("click", () => {
+        RestartBtn.addEventListener("click", () => {
             displayedNames = [];
             resetGame(); // Reset game state
         });
@@ -634,7 +745,7 @@
                     wordElement.textContent = randomName;
                     wordElement.classList.remove("hidden");
                     timerElement.classList.remove("hidden");
-                    if(showReferenceImage.checked){
+                    if (showReferenceImage.checked) {
                         displayImage(randomImageUrl, randomName);
                     }
 
@@ -658,6 +769,26 @@
             });
         });
 
+        // Add search functionality
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const categories = document.querySelectorAll('.category');
+            categories.forEach(category => {
+                const categoryName = category.querySelector('.category-header label').textContent.toLowerCase();
+                const names = category.querySelectorAll('.name-item');
+                let hasVisibleName = false;
+
+                names.forEach(name => {
+                    const nameText = name.querySelector('label').textContent.toLowerCase();
+                    const isVisible = nameText.includes(searchTerm) || categoryName.includes(searchTerm);
+                    name.style.display = isVisible ? 'flex' : 'none';
+                    if (isVisible) hasVisibleName = true;
+                });
+
+                // Toggle category visibility based on search result
+                category.style.display = hasVisibleName ? 'block' : 'none';
+            });
+        });
 
         // Function to toggle visibility and button text
         function toggleVisibility(buttonId, sectionId) {
@@ -690,13 +821,15 @@
 
             const countdownInterval = setInterval(() => {
                 if (count < countdownMessages.length) {
-                    timerElement.textContent = countdownMessages[count];
+                    readySetGo.textContent = countdownMessages[count];
                     count++;
                 } else {
                     clearInterval(countdownInterval);
                     // Disable the Go button and start the timer
+                    readySetGo.textContent = "";
                     const timeRange = parseInt(timeTimeInput.value);
-                    startTimer(timeRange, imageUrl, name);  // Start the 10-second timer
+                    countdownTimer.classList.remove("hidden");
+                    startTimer(timeRange, imageUrl, name);  // Start the timer
                 }
             }, 1000);
         }
@@ -704,22 +837,33 @@
         // Timer function with image display
         function startTimer(duration, imageUrl, name) {
             let timeLeft = duration;
-            timerElement.textContent = timeLeft;
+            timerElement.textContent = timeLeft + "sec";
             const timerInterval = setInterval(() => {
                 timeLeft--;
-                timerElement.textContent = timeLeft;
+                timerElement.textContent = timeLeft + "sec";
+                // Update circular bar
+                if (circularBar) {
+                    const circumference = 2 * Math.PI * 45; // Circle radius is 45
+                    const offset = circumference - (timeLeft / duration) * circumference;
+                    circularBar.style.strokeDashoffset = offset;
+                }
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
+                    // Update circular bar
+                    if (circularBar) {
+                        circularBar.style.strokeDashoffset = 1;
+                    }
                     if (sendAlertMag.checked) {
                         alert("Time's up! Compare your drawings and vote for the best one.");
                     }
                     timerElement.classList.add("hidden");
                     // Display the image after the timer ends
-                    if(!showReferenceImage.checked){
+                    if (!showReferenceImage.checked) {
                         displayImage(imageUrl, name);
                     }
                     // Disable the Go button and start the timer with countdown sequence
                     startButton.disabled = false;
+                    countdownTimer.classList.add("hidden");
                 }
             }, 1000);
         }
