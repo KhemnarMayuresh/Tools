@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatGPT Prompts Splitter</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>ChatGPT Prompts Splitter</h1>
+      <label for="prompt">Enter your long prompt here:</label>
+      <textarea id="prompt"></textarea>
+      <label for="charLimit">Character limit:</label>
+      <input
+        type="number"
+        id="charLimit"
+        name="charLimit"
+        value="12000"
+        min="50"
+        max="15000"
+        step="50"
+      />
+      <div id="charCount"></div>
+      <button id="splitButton">Split Text</button>
+      <div id="splitParts"></div>
+    </div>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
