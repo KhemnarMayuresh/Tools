@@ -6,327 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>30 Second Drawing Game</title>
     <!-- Version 0.0.1 -->
-    <style>
-        /* General body and layout */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0px 30px 20px 20px;
-            padding: 5px;
-            background-color: #f2f2f2;
-            height: 100vh;
-        }
-
-        .container{
-            padding: 0 0 20px 0;
-        }
-        /* Cards */
-        .cards {
-            text-align: left;
-            background: #ffffff;
-            padding: 10px;
-            margin: 5px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-        }
-
-        /* Toggle button */
-        .toggle-btn {
-            font-size: 0.8em;
-            padding: 4px 8px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: #ffffff;
-            transition: background-color 0.3s ease;
-        }
-
-        .toggle-btn:hover {
-            background-color: #0056b3;
-        }
-
-        /* Category section */
-        .settings {
-            text-align: left;
-            background: #ffffff;
-            padding: 10px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-        }
-
-        .searchContainer {
-            width: 100%;
-        }
-
-        .searchContainer input {
-            width: 98%;
-            border: 1px solid black;
-        }
-
-        .categories {
-            height: 50vh;
-            overflow-y: auto;
-            gap: 10px;
-            justify-content: flex-start;
-        }
-
-        .category {
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            min-width: 150px;
-        }
-
-        /* Adjust layout of the checkbox and label */
-        .category-header {
-            padding: 2px;
-            align-items: center;
-            /* Align checkbox and label on the same line */
-        }
-
-        .category-header input {
-            margin-right: 10px;
-            /* Space between checkbox and label */
-        }
-
-        .names {
-            margin-left: 20px;
-        }
-
-        /* Category name items */
-        .name-item {
-            display: flex;
-            align-items: center;
-            /* Align checkbox and label on the same line */
-            margin-bottom: 5px;
-        }
-
-        .name-item input {
-            margin-right: 10px;
-            /* Space between checkbox and label */
-        }
-
-        .name-item .img-container {
-            width: 4rem;
-            height: 4rem;
-        }
-
-        .name-item .img-container img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .text-field {
-            width: 100px;
-            padding: 8px;
-            margin: 10px 0;
-            font-size: 1em;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #fafafa;
-            color: #333;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .text-field:focus {
-            border-color: #4a90e2;
-        }
-
-        /* Button styles */
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            gap: 10px;
-        }
-
-        button {
-            flex: 1;
-            padding: 12px;
-            font-size: 1em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #ffffff;
-            transition: background-color 0.3s ease;
-        }
-
-        #startButton {
-            background-color: #28a745;
-        }
-
-        #startButton:hover {
-            background-color: #218838;
-        }
-
-        #startButton:disabled {
-            background-color: #565a57;
-        }
-
-        #RestartBtn {
-            background-color: #ff0707;
-            padding: 8px 30px;
-            margin-bottom: 5px;
-        }
-
-        #RestartBtn:hover {
-            background-color: #e00000;
-        }
-
-        /* Timer and word display */
-        #word {
-            font-size: 5rem;
-            font-weight: bold;
-            color: red;
-        }
-
-        #timer {
-            font-size: 2rem;
-        }
-
-        #readySetGo {
-            font-size: 2rem;
-        }
-
-        /* Centering the image */
-        #imageDisplay {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        #imageDisplay img {
-            max-width: 100%;
-            max-height: 100vh;
-            margin-top: 10px;
-        }
-
-        /* Ensure the hidden class is defined to hide elements */
-        .hidden {
-            display: none;
-        }
-
-        /* Circular Countdown Progress Bar */
-        .countdown-container.circular {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 20px auto;
-        }
-
-        .progress-circle {
-            transform: rotate(-90deg);
-            width: 100%;
-            height: 100%;
-            fill: none;
-        }
-
-        .progress-circle circle {
-            stroke: #ddd;
-            stroke-width: 10;
-            r: 45;
-            cx: 50;
-            cy: 50;
-        }
-
-        .progress-circle .progress {
-            stroke: #3498db;
-            stroke-dasharray: 283;
-            stroke-dashoffset: 283;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 1s linear;
-        }
-
-        .circular-timer {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #333;
-        }
-
-        @keyframes animated-progress-bar {
-            from {
-                width: 100%;
-            }
-
-            to {
-                width: 0;
-            }
-        }
-
-        /* Timer Styles */
-        .timer {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .categories {
-                justify-content: center;
-            }
-
-            .button-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            #word {
-                font-size: 3rem;
-            }
-
-            #timer {
-                font-size: 1.5rem;
-            }
-
-            #readySetGo {
-                font-size: 1.5rem;
-            }
-
-            #imageDisplay img {
-                max-width: 80%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #word {
-                font-size: 2.5rem;
-            }
-
-            #timer {
-                font-size: 1.2rem;
-            }
-
-            #readySetGo {
-                font-size: 1.2rem;
-            }
-
-            .category {
-                flex: 1 1 100%;
-            }
-
-            .name-item {
-                font-size: 0.9rem;
-            }
-
-            button {
-                font-size: 0.9rem;
-            }
-
-            .text-field {
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
@@ -343,13 +23,15 @@
                 <ol>
                     <li>A word or name will be shown to draw. (Example: Icecream, Iron Man)</li>
                     <li>A timer for the selected time range (default: 30 seconds) starts on the "Go" button click.</li>
-                    <li>All players must draw the shown word within the time limit. Stop drawing when the timer ends.</li>
+                    <li>All players must draw the shown word within the time limit. Stop drawing when the timer ends.
+                    </li>
                     <li>After the time is up, compare drawings and vote on the best one. The winner gets one point.</li>
                     <li>The first player to get the most points wins!</li>
                 </ol>
                 <b style="margin-left: 20px;"><i>Notes:</i></b>
                 <ul>
-                    <li>Each one will only repeat once to draw. You can click on Restart button to start game again with same selection.</li>
+                    <li>Each one will only repeat once to draw. You can click on Restart button to start game again with
+                        same selection.</li>
                 </ul>
             </div>
         </div>
@@ -369,6 +51,10 @@
             </b>
             <button id="RestartBtn">Restart</button>
             <div id="settingsContent">
+                <!-- Add a Select All checkbox -->
+                <label>
+                    <input type="checkbox" id="selectAllCategories"> Select All Categories
+                </label>
                 <div class="searchContainer">
                     <input type="text" id="searchBox" class="text-field"
                         placeholder="Search for categories or names...">
@@ -405,186 +91,8 @@
         </div>
 
     </div>
-
+    <script src="Data.js"></script>
     <script>
-        // Categories data
-        const data = [
-            // Marvel Category
-            { name: "Iron Man", imageUrl: "./images/Iron_Man.jpg", category: "Marvel" },
-            { name: "Captain America", imageUrl: "./images/Captain_America.jpg", category: "Marvel" },
-            { name: "SpiderMan", imageUrl: "./images/SpiderMan.png", category: "Marvel" },
-            { name: "Deadpool", imageUrl: "./images/Deadpool.png", category: "Marvel" },
-            { name: "Thor", imageUrl: "./images/Thor.png", category: "Marvel" },
-            { name: "Hulk", imageUrl: "./images/Hulk.jpg", category: "Marvel" },
-            { name: "Black Widow", imageUrl: "./images/Black Widow.png", category: "Marvel" },
-            { name: "Ant Man", imageUrl: "./images/Ant Man.png", category: "Marvel" },
-            { name: "Dr. Strange", imageUrl: "./images/Doctor-Strange.png", category: "Marvel" },
-            { name: "Hawkeye", imageUrl: "./images/Hawkeye.png", category: "Marvel" },
-            { name: "Black Panther", imageUrl: "./images/Black Panther.jpg", category: "Marvel" },
-            { name: "Wanda Maximoff", imageUrl: "./images/Wanda Maximoff.png", category: "Marvel" },
-            { name: "Loki", imageUrl: "./images/Loki.png", category: "Marvel" },
-            { name: "Thanos", imageUrl: "./images/Thanos.png", category: "Marvel" },
-            { name: "Wolverine", imageUrl: "./images/Wolverine.png", category: "Marvel" },
-
-            // DC Category
-            { name: "Batman", imageUrl: "./images/Batman.png", category: "DC" },
-            { name: "Superman", imageUrl: "./images/Superman.png", category: "DC" },
-            { name: "Wonder Woman", imageUrl: "./images/Wonder Women.png", category: "DC" },
-            { name: "Flash", imageUrl: "./images/Flash.jpg", category: "DC" },
-            { name: "Aquaman", imageUrl: "./images/Aquaman.png", category: "DC" },
-            { name: "Joker", imageUrl: "./images/Joker.png", category: "DC" },
-            // Add more
-
-            // Doraemon  Category
-            { name: "Doraemon ", imageUrl: "./images/Doraemon.png", category: "Doraemon" },
-            { name: "Nobita", imageUrl: "./images/Nobita.png", category: "Doraemon" },
-            { name: "Shizuka", imageUrl: "./images/Shizuka.png", category: "Doraemon" },
-            { name: "Suneo", imageUrl: "./images/Suneo.jpg", category: "Doraemon" },
-            { name: "Gian", imageUrl: "./images/Gian.png", category: "Doraemon" },
-            { name: "Dorami", imageUrl: "./images/Dorami.png", category: "Doraemon" },
-            { name: "Dekisugi", imageUrl: "./images/Dekisugi.jpg", category: "Doraemon" },
-
-            // Shinchan Category
-            { name: "Shinchan", imageUrl: "./images/Shinchan.png", category: "Shinchan" },
-            { name: "Hiroshi", imageUrl: "./images/Hiroshi.png", category: "Shinchan" },
-            { name: "Misae", imageUrl: "./images/Misae.png", category: "Shinchan" },
-            { name: "himawari", imageUrl: "./images/himawari.png", category: "Shinchan" },
-            { name: "Shiro", imageUrl: "./images/Shiro.png", category: "Shinchan" },
-            { name: "Ai Chan", imageUrl: "./images/Ai Chan.jpg", category: "Shinchan" },
-            { name: "Kazama", imageUrl: "./images/kazama.png", category: "Shinchan" },
-            { name: "Boo", imageUrl: "./images/boo.jpg", category: "Shinchan" },
-            { name: "Nene", imageUrl: "./images/Nene.jpg", category: "Shinchan" },
-            { name: "Masao", imageUrl: "./images/masao.png", category: "Shinchan" },
-            { name: "Action Kamen", imageUrl: "./images/Action Kamen.png", category: "Shinchan" },
-
-            // Mickey Mouse Category
-            { name: "Mickey Mouse", imageUrl: "./images/Mickey Mouse.png", category: "Mickey_Mouse" },
-            { name: "Goofy", imageUrl: "./images/Goofy.png", category: "Mickey_Mouse" },
-            { name: "Pluto", imageUrl: "./images/Pluto.jpg", category: "Mickey_Mouse" },
-
-            // Chhota Bheem Category
-            { name: "Chhota Bheem", imageUrl: "./images/Chhota Bheem.png", category: "Chhota_Bheem" },
-            { name: "Chutki", imageUrl: "./images/Chutki.jpg", category: "Chhota_Bheem" },
-            { name: "Rajkumar Indumati", imageUrl: "./images/Rajkumar Indumati.jpg", category: "Chhota_Bheem" },
-            { name: "Raju", imageUrl: "./images/Raju.png", category: "Chhota_Bheem" },
-            { name: "Jaggu", imageUrl: "./images/Jaggu.png", category: "Chhota_Bheem" },
-            { name: "Kalia", imageUrl: "./images/Kalia.jpg", category: "Chhota_Bheem" },
-            { name: "Dholu-Bholu", imageUrl: "./images/Dholu-Bholu.jpg", category: "Chhota_Bheem" },
-
-            // Indian Category
-            { name: "Shaktimaan", imageUrl: "./images/Shaktimaan.jpeg", category: "Indian_Characters" },
-            { name: "Hero", imageUrl: "./images/Hero.png", category: "Indian_Characters" },
-            { name: "Krrish", imageUrl: "./images/Krrish.jpg", category: "Indian_Characters" },
-            { name: "Modi", imageUrl: "./images/Modi.jpg", category: "Indian_Characters" },
-            { name: "Dhoni", imageUrl: "./images/Dhoni.jpg", category: "Indian_Characters" },
-            { name: "Salman", imageUrl: "./images/Salman.png", category: "Indian_Characters" },
-            { name: "Shahrukh", imageUrl: "./images/Shah-rukh-khan.png", category: "Indian_Characters" },
-            // Add more
-
-            // Demon Slayer Characters
-            { name: "Tanjiro Kamado", imageUrl: "./images/Tanjiro_Kamado.png", category: "Demon_Slayer" },
-            { name: "Nezuko Kamado", imageUrl: "./images/nezuko.jpg", category: "Demon_Slayer" },
-            { name: "Zenitsu Agatsuma", imageUrl: "./images/Zenitsu.png", category: "Demon_Slayer" },
-            { name: "Inosuke Hashibira", imageUrl: "./images/Inosuke.png", category: "Demon_Slayer" },
-            { name: "Muzan", imageUrl: "./images/Muzan.png", category: "Demon_Slayer" },
-            // { name: "Muzan 2", imageUrl: "./images/muzan.jpg", category: "Demon_Slayer" }, 
-            { name: "Akaza", imageUrl: "./images/Akaza.png", category: "Demon_Slayer" },
-            { name: "Rengoku", imageUrl: "./images/Rengoku.png", category: "Demon_Slayer" },
-            { name: "Muichiro Tokito", imageUrl: "./images/Muichiro_Tokito.png", category: "Demon_Slayer" },
-            { name: "Tengen Uzui", imageUrl: "./images/Tengen Uzui.jpg", category: "Demon_Slayer" },
-            { name: "Obanai Iguro", imageUrl: "./images/Obanai Iguro.jpg", category: "Demon_Slayer" },
-            { name: "Mitsuri Kanroji", imageUrl: "./images/Mitsuri Kanroji.png", category: "Demon_Slayer" },
-            { name: "Giyu Tomioka", imageUrl: "./images/Giyu Tomioka.png", category: "Demon_Slayer" },
-            { name: "Sanemi Shinazugawa", imageUrl: "./images/Sanemi Shinazugawa.jpeg", category: "Demon_Slayer" },
-            { name: "Gyomei Himejima", imageUrl: "./images/Gyomei Himejima.png", category: "Demon_Slayer" },
-            { name: "Shinobu Kocho", imageUrl: "./images/Shinobu Kocho.png", category: "Demon_Slayer" },
-            { name: "Kanae Kocho", imageUrl: "./images/Kanae Kocho.jpg", category: "Demon_Slayer" },
-
-            // Pokémon Characters
-            { name: "Pikachu", imageUrl: "./images/Pikachu.jpg", category: "Pokémon" },
-            { name: "Ash Ketchum", imageUrl: "./images/Ash Ketchum.jpg", category: "Pokémon" },
-            { name: "Misty", imageUrl: "./images/Misty.png", category: "Pokémon" },
-            { name: "Brock", imageUrl: "./images/Brock.png", category: "Pokémon" },
-            { name: "Charizard", imageUrl: "./images/Charizard.png", category: "Pokémon" },
-            { name: "Bulbasaur", imageUrl: "./images/Bulbasaur.png", category: "Pokémon" },
-            { name: "jigglypuff", imageUrl: "./images/jigglypuff.jpg", category: "Pokémon" },
-            { name: "Squirtle", imageUrl: "./images/Squirtle.png", category: "Pokémon" },
-            { name: "Meowth", imageUrl: "./images/Meowth.png", category: "Pokémon" },
-            { name: "Charizard", imageUrl: "./images/Charizard.png", category: "Pokémon" },
-            // Add more
-
-            // Scooby-Doo Characters
-            { name: "Scooby-Doo", imageUrl: "./images/Scooby-Doo.png", category: "Scooby-Doo" },
-            { name: "Shaggy", imageUrl: "./images/shaggy.png", category: "Scooby-Doo" },
-            { name: "Velma", imageUrl: "./images/velma.png", category: "Scooby-Doo" },
-            { name: "Daphne", imageUrl: "./images/daphne.png", category: "Scooby-Doo" },
-            { name: "Fred", imageUrl: "./images/fred.png", category: "Scooby-Doo" },
-
-            // Powerpuff Girls Characters
-            { name: "Blossom", imageUrl: "./images/Blossom.jpg", category: "Powerpuff_Girls" },
-            { name: "Bubbles", imageUrl: "./images/bubbles.jpg", category: "Powerpuff_Girls" },
-            { name: "Buttercup", imageUrl: "./images/buttercup.png", category: "Powerpuff_Girls" },
-            { name: "Professor Utonium", imageUrl: "./images/Professor Utonium.png", category: "Powerpuff_Girls" },
-
-            // Ben 10 Characters
-            { name: "Ben Tennyson", imageUrl: "./images/Ben 10.png", category: "Ben_10" },
-            { name: "Grandpa Max", imageUrl: "./images/Grandpa Max.png", category: "Ben_10" },
-            { name: "Gwen Tennyson", imageUrl: "./images/gwen.png", category: "Ben_10" },
-            { name: "Kevin Levin", imageUrl: "./images/Kevin.jpg", category: "Ben_10" },
-            // Add more
-
-            // Naruto Characters
-            { name: "Naruto Uzumaki", imageUrl: "./images/Naruto.png", category: "Naruto" },
-            { name: "Sasuke Uchiha", imageUrl: "./images/Sasuke.png", category: "Naruto" },
-            { name: "Sakura Haruno", imageUrl: "./images/Sakura.png", category: "Naruto" },
-            { name: "Kakashi", imageUrl: "./images/Kakashi.png", category: "Naruto" },
-            { name: "Madara Uchiha", imageUrl: "./images/madara uchiha.png", category: "Naruto" },
-            // Add more
-
-            // Dragon_Ball_Z Characters
-            { name: "Goku", imageUrl: "./images/Goku.png", category: "Dragon_Ball_Z" },
-            { name: "Vegeta", imageUrl: "./images/Vegeta.webp", category: "Dragon_Ball_Z" },
-            { name: "Gohan", imageUrl: "./images/Gohan.png", category: "Dragon_Ball_Z" },
-            { name: "Piccolo", imageUrl: "./images/Piccolo.png", category: "Dragon_Ball_Z" },
-            // Add more
-
-            // One Piece Characters
-            { name: "Monkey D. Luffy", imageUrl: "./images/Luffy.png", category: "One_Piece" },
-            { name: "Roronoa Zoro", imageUrl: "./images/Zoro.png", category: "One_Piece" },
-            { name: "Nami", imageUrl: "./images/Nami.png", category: "One_Piece" },
-            // Add more
-
-            // Attack on Titan Characters
-            { name: "Eren Yeager", imageUrl: "./images/Eren Yeager.jpg", category: "Attack_on_Titan" },
-            { name: "Mikasa Ackerman", imageUrl: "./images/Mikasa Ackerman.png", category: "Attack_on_Titan" },
-            { name: "Armin Arlert", imageUrl: "./images/Armin Arlert.png", category: "Attack_on_Titan" },
-
-            // Death Note Characters
-            { name: "Light Yagami", imageUrl: "./images/Light Yagami.png", category: "Death_Note" },
-            { name: "L", imageUrl: "./images/L.png", category: "Death_Note" },
-            { name: "Ryuk", imageUrl: "./images/Ryuk.jpeg", category: "Death_Note" },
-
-            // jujutsu kaisen Characters
-            { name: "Satoru Gojo", imageUrl: "./images/satoru gojo.png", category: "Jujutsu_Kaisen" },
-            { name: "Suguru Geto", imageUrl: "./images/Suguru Geto.png", category: "Jujutsu_Kaisen" },
-            { name: "Ryomen Sukuna", imageUrl: "./images/Ryomen Sukuna.jpg", category: "Jujutsu_Kaisen" },
-            { name: "Yuji Itadori", imageUrl: "./images/Yuji Itadori.png", category: "Jujutsu_Kaisen" },
-            { name: "Megumi Fushiguro", imageUrl: "./images/Megumi Fushiguro.png", category: "Jujutsu_Kaisen" },
-            { name: "Nobara Kugisaki", imageUrl: "./images/Nobara Kugisaki.png", category: "Jujutsu_Kaisen" },
-            { name: "Kento Nanami", imageUrl: "./images/Kento Nanami.png", category: "Jujutsu_Kaisen" },
-            { name: "Masamichi Yaga", imageUrl: "./images/Masamichi Yaga.png", category: "Jujutsu_Kaisen" },
-            { name: "Yuta Okkotsu", imageUrl: "./images/Yuta Okkotsu.png", category: "Jujutsu_Kaisen" },
-            { name: "Maki Zenin", imageUrl: "./images/Maki Zenin.png", category: "Jujutsu_Kaisen" },
-            { name: "Aoi Todo", imageUrl: "./images/Aoi Todo.png", category: "Jujutsu_Kaisen" },
-            { name: "Master Tengen", imageUrl: "./images/Master Tengen.png", category: "Jujutsu_Kaisen" },
-            { name: "Choso", imageUrl: "./images/Choso.png", category: "Jujutsu_Kaisen" },
-            { name: "Toji Fushiguro", imageUrl: "./images/Toji Fushiguro.png", category: "Jujutsu_Kaisen" },
-            { name: "Mahito", imageUrl: "./images/Mahito.png", category: "Jujutsu_Kaisen" },
-            { name: "Jogo", imageUrl: "./images/Jogo.jpeg", category: "Jujutsu_Kaisen" },
-            { name: "Hanami", imageUrl: "./images/Hanami.png", category: "Jujutsu_Kaisen" },
-            // Add more
-        ];
-
         // Organize categories
         const categories = data.reduce((acc, { name, category, imageUrl }) => {
             if (!acc[category]) acc[category] = [];
@@ -604,6 +112,10 @@
             const categoryCheckbox = document.createElement('input');
             categoryCheckbox.type = 'checkbox';
             categoryCheckbox.id = category;
+            let isDefaultChecked = defaultSelectedCategories.includes(category);
+            if (isDefaultChecked) {
+                categoryCheckbox.checked = true;
+            }
 
             const label = document.createElement('label');
             label.htmlFor = category;
@@ -633,6 +145,10 @@
                 const nameCheckbox = document.createElement('input');
                 nameCheckbox.type = 'checkbox';
                 nameCheckbox.id = item.name;
+                if (isDefaultChecked) {
+                    nameCheckbox.checked = true;
+                }
+
 
                 const nameLabel = document.createElement('label');
                 nameLabel.htmlFor = item.name;
@@ -674,6 +190,24 @@
                 root.appendChild(categoryCheckbox);
             });
         };
+
+        // Select all checkbox functionality
+        const selectAllCategories = document.getElementById('selectAllCategories');
+
+        // Function to check/uncheck all category checkboxes
+        selectAllCategories.addEventListener('change', () => {
+            const container = document.querySelector('.categories');
+            const isChecked = selectAllCategories.checked;
+            const categoryCheckboxes = container.querySelectorAll('.category-header input[type="checkbox"]');
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;// Select or unselect all name checkboxes based on category checkbox state
+                const nameCheckboxes = container.querySelectorAll('.name-item input');
+                nameCheckboxes.forEach(checkboxNames => {
+                    checkboxNames.checked = isChecked;
+                });
+            });
+        });
+
 
         // Timer and word management
         const timeTimeInput = document.getElementById('timeTime');

@@ -1,0 +1,320 @@
+/* General body and layout */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0px 30px 20px 20px;
+    padding: 5px;
+    background-color: #f2f2f2;
+    height: 100vh;
+}
+
+.container {
+    padding: 0 0 20px 0;
+}
+
+/* Cards */
+.cards {
+    text-align: left;
+    background: #ffffff;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+/* Toggle button */
+.toggle-btn {
+    font-size: 0.8em;
+    padding: 4px 8px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Category section */
+.settings {
+    text-align: left;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+.searchContainer {
+    width: 100%;
+}
+
+.searchContainer input {
+    width: 98%;
+    border: 1px solid black;
+}
+
+.categories {
+    height: 50vh;
+    overflow-y: auto;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.category {
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+}
+
+/* Adjust layout of the checkbox and label */
+.category-header {
+    padding: 2px;
+    align-items: center;
+    /* Align checkbox and label on the same line */
+}
+
+.category-header input {
+    margin-right: 10px;
+    /* Space between checkbox and label */
+}
+
+.names {
+    margin-left: 20px;
+}
+
+/* Category name items */
+.name-item {
+    display: flex;
+    align-items: center;
+    /* Align checkbox and label on the same line */
+    margin-bottom: 5px;
+}
+
+.name-item input {
+    margin-right: 10px;
+    /* Space between checkbox and label */
+}
+
+.name-item .img-container {
+    width: 4rem;
+    height: 4rem;
+}
+
+.name-item .img-container img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.text-field {
+    width: 100px;
+    padding: 8px;
+    margin: 10px 0;
+    font-size: 1em;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+    color: #333;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.text-field:focus {
+    border-color: #4a90e2;
+}
+
+/* Button styles */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    padding: 12px;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+#startButton {
+    background-color: #28a745;
+}
+
+#startButton:hover {
+    background-color: #218838;
+}
+
+#startButton:disabled {
+    background-color: #565a57;
+}
+
+#RestartBtn {
+    background-color: #ff0707;
+    padding: 8px 30px;
+    margin-bottom: 5px;
+}
+
+#RestartBtn:hover {
+    background-color: #e00000;
+}
+
+/* Timer and word display */
+#word {
+    font-size: 5rem;
+    font-weight: bold;
+    color: red;
+}
+
+#timer {
+    font-size: 2rem;
+}
+
+#readySetGo {
+    font-size: 2rem;
+}
+
+/* Centering the image */
+#imageDisplay {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#imageDisplay img {
+    max-width: 100%;
+    max-height: 100vh;
+    margin-top: 10px;
+}
+
+/* Ensure the hidden class is defined to hide elements */
+.hidden {
+    display: none;
+}
+
+/* Circular Countdown Progress Bar */
+.countdown-container.circular {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 20px auto;
+}
+
+.progress-circle {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+    fill: none;
+}
+
+.progress-circle circle {
+    stroke: #ddd;
+    stroke-width: 10;
+    r: 45;
+    cx: 50;
+    cy: 50;
+}
+
+.progress-circle .progress {
+    stroke: #3498db;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.circular-timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+@keyframes animated-progress-bar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0;
+    }
+}
+
+/* Timer Styles */
+.timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .categories {
+        justify-content: center;
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #word {
+        font-size: 3rem;
+    }
+
+    #timer {
+        font-size: 1.5rem;
+    }
+
+    #readySetGo {
+        font-size: 1.5rem;
+    }
+
+    #imageDisplay img {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 480px) {
+    #word {
+        font-size: 2.5rem;
+    }
+
+    #timer {
+        font-size: 1.2rem;
+    }
+
+    #readySetGo {
+        font-size: 1.2rem;
+    }
+
+    .category {
+        flex: 1 1 100%;
+    }
+
+    .name-item {
+        font-size: 0.9rem;
+    }
+
+    button {
+        font-size: 0.9rem;
+    }
+
+    .text-field {
+        font-size: 0.9rem;
+    }
+}
