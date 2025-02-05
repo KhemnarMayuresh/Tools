@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Drag and Drop with Autosave</title>
+    <title>गीतकारिका Text Editor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -88,58 +88,105 @@
             display: none;
         }
 
+        .collapsed-button {
+            position: relative;
+            top: 50px;
+            padding: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #sidebar button#toggleSidebar {
+            background-color: #4B0082;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 2.2em;
+            border-radius: 5px;
+            transition: right 0.3s ease;
+            height: max-content;
+            width: max-content;
+            padding: 0;
+        }
+
+        #toggleSidebar.collapsed {
+            right: -5px;
+        }
+
         /* Main Content Area */
         #main {
             margin-left: 220px;
-            padding: 5px 20px;
+            padding: 20px;
             width: calc(100% - 220px);
             transition: margin-left 0.3s ease, width 0.3s ease;
         }
 
         #main.collapsed {
-            margin-left: 60px;
-            width: calc(100% - 50px);
+            margin-left: 70px;
+            width: calc(100% - 70px);
         }
 
-        /* Editable Div Container */
-        .custom-container {
-            width: 350px;
-            height: 400px;
-            border: 2px dashed #ccc;
-            padding: 5px;
-            margin: 5px;
-            display: inline-block;
-            vertical-align: top;
-            text-align: center;
+        /* Container for Sections */
+        #container {
+            display: flex;
+            flex-wrap: wrap; /* Allow sections to wrap into rows */
+            gap: 20px; /* Space between sections */
+        }
+
+        /* Section Divs */
+        .section {
+            border: 2px dashed #4B0082;
+            padding: 15px;
             background-color: #f9f9f9;
+            border-radius: 8px;
+            min-height: 100px;
+            min-width: 300px; /* Minimum width for sections */
+            resize: both; /* Make sections resizable */
+            overflow: auto; /* Handle overflow when resized */
             position: relative;
-            resize: both;
-            overflow: auto;
+            flex: 1 1 300px; /* Flex-grow, flex-shrink, flex-basis */
+            box-sizing: border-box;
+        }
+
+        .section h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            color: #4B0082;
+        }
+
+        /* Delete Button for Sections */
+        .section-delete-button {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background-color: transparent;
+            color: #ff1744;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+
+        .section-delete-button:hover {
+            color: #ff5252;
         }
 
         /* Editable Divs */
         .editable-div {
-            position: absolute;
-            display: inline-block;
+            position: relative;
             border: 1px solid #ddd;
+            padding: 15px;
             background-color: white;
             cursor: move;
-            padding: 10px;
-            margin: 2px auto;
+            width: calc(100% - 30px);
+            box-sizing: border-box;
             resize: horizontal;
-            overflow: hidden;
-            text-align: center;
-            min-width: 50px;
-            width: 100px;
+            overflow: auto;
+            min-width: 150px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .editable-div[contenteditable="true"] {
-            border: none;
-            background-color: transparent;
-            outline: none;
+            margin-bottom: 10px;
         }
 
         .editable-div:focus-within {
@@ -148,10 +195,11 @@
             transform: translateY(-2px);
         }
 
-        .editable-div .delete-btn {
+        /* Delete Button for Editable Divs */
+        .delete-button {
             position: absolute;
             top: 8px;
-            right: 4px;
+            right: 10px;
             background-color: transparent;
             color: #ff1744;
             border: none;
@@ -163,10 +211,6 @@
         .delete-button:hover {
             color: #ff5252;
         }
-
-        .editable-div.dragging {
-            opacity: 0.5;
-        }
     </style>
 </head>
 
@@ -177,19 +221,21 @@
             <button id="toggleSidebar" class="collapsed">≡</button>
             <h1>गीतकारिका</h1>
         </div>
-        <button id="create-editable">
+        <button id="addSectionButton">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="#9575CD"></circle>
+                <path fill="#7454B3"
+                    d="M12 6a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1z" />
+            </svg>
+            <span>Add Section</span>
+        </button>
+        <button id="addDivButton">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" fill="#9575CD"></circle>
                 <path fill="#7454B3"
                     d="M12 6a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1z" />
             </svg>
             <span>Add Editable Div</span>
-        </button>
-        <button id="create-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <rect x="2" y="2" width="20" height="20" fill="none" stroke="#9575CD" stroke-dasharray="4" stroke-width="2"/>
-            </svg>                       
-            <span>Create Custom Container</span>
         </button>
         <button id="deleteAllButton">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 48 48">
@@ -204,172 +250,157 @@
     </div>
 
     <div id="main">
-        <div id="container-area"></div>
+        <div id="container"></div>
     </div>
 
     <script>
-        const containerArea = document.getElementById('container-area');
-        const createContainerButton = document.getElementById('create-container');
-        const createEditableButton = document.getElementById('create-editable');
+        const container = document.getElementById('container');
         const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
         const toggleSidebarBtn = document.getElementById('toggleSidebar');
 
-        // Save and Load State to/from localStorage
-        function saveState() {
-            const state = [];
-            document.querySelectorAll('.custom-container').forEach((container, index) => {
-                const containerData = {
-                    id: index,
-                    width: container.style.width,
-                    height: container.style.height,
-                    content: [],
-                };
-
-                container.querySelectorAll('.editable-div').forEach((div) => {
-                    const divData = {
-                        text: div.innerText,
-                        width: div.style.width,
-                        left: div.style.left,
-                        top: div.style.top,
-                    };
-                    containerData.content.push(divData);
-                });
-
-                state.push(containerData);
+        // Load saved sections and divs from localStorage
+        const loadSections = () => {
+            const sections = JSON.parse(localStorage.getItem('sections')) || [];
+            sections.forEach(section => {
+                const newSection = createSection(section.id);
+                section.divs.forEach(div => createEditableDiv(div.text, div.id, newSection));
             });
+        };
 
-            localStorage.setItem('dragDropState', JSON.stringify(state));
-        }
+        // Create a new section
+        const createSection = (id) => {
+            const newSection = document.createElement('div');
+            newSection.className = 'section';
+            newSection.dataset.id = id;
+            newSection.innerHTML = `<h2>Section</h2>`;
 
-        function loadState() {
-            const savedState = JSON.parse(localStorage.getItem('dragDropState'));
-            if (savedState) {
-                containerArea.innerHTML = '';
-                savedState.forEach((containerData) => {
-                    const newContainer = document.createElement('div');
-                    newContainer.classList.add('custom-container');
-                    newContainer.style.width = containerData.width;
-                    newContainer.style.height = containerData.height;
+            // Add delete button for the section
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = ` <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0 0 120 120">
+            <rect width="114.551" height="15" x="2.724" y="57.5" opacity=".35" transform="rotate(-45.001 60 65.001)"></rect><rect width="114.551" height="15" x="2.724" y="52.5" fill="#ff1200" transform="rotate(-45.001 60 60.001)"></rect><rect width="15" height="114.551" x="52.5" y="7.724" opacity=".35" transform="rotate(-45.001 60 65.001)"></rect><rect width="15" height="114.551" x="52.5" y="2.724" fill="#ff1200" transform="rotate(-45.001 60 60.001)"></rect>
+            </svg>`;
+            deleteButton.className = 'section-delete-button';
+            deleteButton.addEventListener('click', () => deleteSection(newSection));
 
-                    containerData.content.forEach((divData) => {
-                        const newEditableDiv = createEditableDiv(divData.text, divData.width);
-                        newEditableDiv.style.left = divData.left;
-                        newEditableDiv.style.top = divData.top;
-                        newContainer.appendChild(newEditableDiv);
-                    });
-
-                    initializeCustomContainer(newContainer);
-                    containerArea.appendChild(newContainer);
-                });
-            } else {
-                createContainerButton.click();
-            }
-        }
+            newSection.appendChild(deleteButton);
+            container.appendChild(newSection);
+            return newSection;
+        };
 
         // Create a new editable div
-        function createEditableDiv(text = 'Edit me!', width = '300px') {
-            const newEditableDiv = document.createElement('div');
-            newEditableDiv.classList.add('editable-div');
-            newEditableDiv.draggable = true;
-            newEditableDiv.id = `editable-div-${Date.now()}`;
-            newEditableDiv.style.width = width;
-            newEditableDiv.style.left = '0px'; // Initially positioned at 0px
-            newEditableDiv.style.top = '0px'; // Initially positioned at 0px
-            newEditableDiv.contentEditable = "true"; // Make div content editable
-            newEditableDiv.innerText = text;
+        const createEditableDiv = (text, id, parentSection) => {
+            const newDiv = document.createElement('div');
+            newDiv.className = 'editable-div';
+            newDiv.setAttribute('contenteditable', 'true');
+            newDiv.setAttribute('draggable', 'true');
+            newDiv.textContent = text;
+            newDiv.dataset.id = id;
 
+            // Delete button inside each div
             const deleteButton = document.createElement('button');
-            deleteButton.classList.add('delete-btn');
-            deleteButton.innerHTML = ` 
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 120 120">
-                  <rect width="114.551" height="15" x="2.724" y="57.5" opacity=".35" transform="rotate(-45.001 60 65.001)"></rect>
-                  <rect width="114.551" height="15" x="2.724" y="52.5" fill="#ff1200" transform="rotate(-45.001 60 60.001)"></rect>
-                  <rect width="15" height="114.551" x="52.5" y="7.724" opacity=".35" transform="rotate(-45.001 60 65.001)"></rect>
-                  <rect width="15" height="114.551" x="52.5" y="2.724" fill="#ff1200" transform="rotate(-45.001 60 60.001)"></rect>
-                </svg>`;
-            newEditableDiv.appendChild(deleteButton);
+            deleteButton.innerHTML = ` <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0 0 120 120">
+            <rect width="114.551" height="15" x="2.724" y="57.5" opacity=".35" transform="rotate(-45.001 60 65.001)"></rect><rect width="114.551" height="15" x="2.724" y="52.5" fill="#ff1200" transform="rotate(-45.001 60 60.001)"></rect><rect width="15" height="114.551" x="52.5" y="7.724" opacity=".35" transform="rotate(-45.001 60 65.001)"></rect><rect width="15" height="114.551" x="52.5" y="2.724" fill="#ff1200" transform="rotate(-45.001 60 60.001)"></rect>
+            </svg>`;
+            deleteButton.className = 'delete-button';
+            deleteButton.addEventListener('click', () => deleteDiv(newDiv));
 
-            initializeEditableDiv(newEditableDiv);
-            return newEditableDiv;
-        }
+            newDiv.appendChild(deleteButton);
 
-        // Make the editable divs draggable
-        function initializeEditableDiv(editableDiv) {
-            let offsetX, offsetY;
-            editableDiv.addEventListener('dragstart', (event) => {
-                event.dataTransfer.setData('text', event.target.id);
-                event.target.classList.add('dragging');
-                offsetX = event.clientX - event.target.getBoundingClientRect().left;
-                offsetY = event.clientY - event.target.getBoundingClientRect().top;
-            });
+            newDiv.addEventListener('input', saveSections);
+            newDiv.addEventListener('dragstart', dragStart);
+            newDiv.addEventListener('dragover', dragOver);
+            newDiv.addEventListener('drop', drop);
 
-            editableDiv.addEventListener('dragend', (event) => {
-                event.target.classList.remove('dragging');
-                saveState();
-            });
+            parentSection.appendChild(newDiv);
+        };
 
-            // Handle the mouse movement while dragging
-            editableDiv.addEventListener('dragover', (event) => {
-                event.preventDefault();
-                const dragDiv = event.target;
-                dragDiv.style.left = `${event.clientX - offsetX}px`;
-                dragDiv.style.top = `${event.clientY - offsetY}px`;
-            });
+        // Save sections and divs to localStorage
+        const saveSections = () => {
+            const sections = Array.from(container.children).map(section => ({
+                id: section.dataset.id,
+                divs: Array.from(section.children).filter(child => child.classList.contains('editable-div')).map(div => ({
+                    id: div.dataset.id,
+                    text: div.childNodes[0].textContent
+                }))
+            }));
+            localStorage.setItem('sections', JSON.stringify(sections));
+        };
 
-            editableDiv.querySelector('.delete-btn').addEventListener('click', () => {
-                editableDiv.remove();
-                saveState();
-            });
-        }
-
-        // Initialize a new custom container
-        function initializeCustomContainer(container) {
-            container.addEventListener('dragover', (event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-            });
-
-            container.addEventListener('drop', (event) => {
-                event.preventDefault();
-                const draggedElementId = event.dataTransfer.getData('text');
-                const draggedElement = document.getElementById(draggedElementId);
-                container.appendChild(draggedElement);
-                saveState();
-            });
-        }
-
-        // Create a new custom container
-        createContainerButton.addEventListener('click', () => {
-            const newContainer = document.createElement('div');
-            newContainer.classList.add('custom-container');
-            initializeCustomContainer(newContainer);
-            containerArea.appendChild(newContainer);
-            saveState();
+        // Add new section
+        document.getElementById('addSectionButton').addEventListener('click', function () {
+            const newId = `section-${Date.now()}`;
+            createSection(newId);
+            saveSections();
         });
 
-        // Add a new editable div to the first container
-        createEditableButton.addEventListener('click', () => {
-            const firstContainer = document.querySelector('.custom-container');
-            if (!firstContainer) {
-                alert('Please create a custom container first.');
+        // Add new editable div to the last section
+        document.getElementById('addDivButton').addEventListener('click', function () {
+            const sections = container.querySelectorAll('.section');
+            if (sections.length === 0) {
+                alert('Please create a section first.');
                 return;
             }
-
-            const newEditableDiv = createEditableDiv();
-            firstContainer.appendChild(newEditableDiv);
-            saveState();
+            const lastSection = sections[sections.length - 1];
+            const newId = `div-${Date.now()}`;
+            createEditableDiv('Editable content', newId, lastSection);
+            saveSections();
         });
 
-        // Delete all divs with confirmation
+        // Delete all sections and divs with confirmation
         document.getElementById('deleteAllButton').addEventListener('click', function () {
-            if (confirm('Are you sure you want to delete all divs?')) {
-                containerArea.innerHTML = '';
-                localStorage.removeItem('editableDivs');
+            if (confirm('Are you sure you want to delete all sections and divs?')) {
+                container.innerHTML = '';
+                localStorage.removeItem('sections');
             }
         });
 
-        // Load saved state on page load
-        window.addEventListener('DOMContentLoaded', loadState);
+        // Delete a specific section with confirmation
+        const deleteSection = (section) => {
+            if (confirm('Are you sure you want to delete this section and all its contents?')) {
+                section.remove();
+                saveSections();
+            }
+        };
+
+        // Delete a specific div with confirmation
+        const deleteDiv = (div) => {
+            if (confirm('Are you sure you want to delete this div?')) {
+                div.remove();
+                saveSections();
+            }
+        };
+
+        let draggedElement;
+
+        function dragStart(event) {
+            draggedElement = this;
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            if (draggedElement !== this) {
+                const targetSection = this.closest('.section');
+                targetSection.insertBefore(draggedElement, this);
+                saveSections();
+            }
+        }
+
+        // Toggle sidebar collapse
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('collapsed');
+            const buttons = document.querySelectorAll('#sidebar button:not(#toggleSidebar)');
+            buttons.forEach(button => button.classList.toggle('collapsed-button'));
+        });
+
+        // Load saved data on page load
+        loadSections();
     </script>
 
 </body>
