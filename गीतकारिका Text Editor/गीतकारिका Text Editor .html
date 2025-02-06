@@ -148,10 +148,19 @@
             box-sizing: border-box;
         }
 
-        .section h2 {
-            margin: 0 0 10px 0;
+        /* Editable Section Name */
+        .section-name {
             font-size: 1.2em;
             color: #4B0082;
+            margin: 0 0 10px 0;
+            cursor: text;
+            outline: none;
+            border-bottom: 1px dashed transparent;
+            transition: border-bottom 0.3s ease;
+        }
+
+        .section-name:focus {
+            border-bottom: 1px dashed #4B0082;
         }
 
         /* Delete Button for Sections */
@@ -263,17 +272,23 @@
         const loadSections = () => {
             const sections = JSON.parse(localStorage.getItem('sections')) || [];
             sections.forEach(section => {
-                const newSection = createSection(section.id);
+                const newSection = createSection(section.id, section.name);
                 section.divs.forEach(div => createEditableDiv(div.text, div.id, newSection));
             });
         };
 
         // Create a new section
-        const createSection = (id) => {
+        const createSection = (id, name = "Section") => {
             const newSection = document.createElement('div');
             newSection.className = 'section';
             newSection.dataset.id = id;
-            newSection.innerHTML = `<h2>Section</h2>`;
+
+            // Editable section name
+            const sectionName = document.createElement('div');
+            sectionName.className = 'section-name';
+            sectionName.setAttribute('contenteditable', 'true');
+            sectionName.textContent = name;
+            sectionName.addEventListener('input', saveSections);
 
             // Add delete button for the section
             const deleteButton = document.createElement('button');
@@ -283,6 +298,7 @@
             deleteButton.className = 'section-delete-button';
             deleteButton.addEventListener('click', () => deleteSection(newSection));
 
+            newSection.appendChild(sectionName);
             newSection.appendChild(deleteButton);
             container.appendChild(newSection);
             return newSection;
@@ -319,6 +335,7 @@
         const saveSections = () => {
             const sections = Array.from(container.children).map(section => ({
                 id: section.dataset.id,
+                name: section.querySelector('.section-name').textContent,
                 divs: Array.from(section.children).filter(child => child.classList.contains('editable-div')).map(div => ({
                     id: div.dataset.id,
                     text: div.childNodes[0].textContent
