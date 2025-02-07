@@ -157,10 +157,24 @@
             outline: none;
             border-bottom: 1px dashed transparent;
             transition: border-bottom 0.3s ease;
+            padding-left: 35px;
         }
 
         .section-name:focus {
             border-bottom: 1px dashed #4B0082;
+        }
+
+        /* Toggle section button */
+        .section-toggle-button {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            background-color: transparent;
+            color: #ff1744;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
         }
 
         /* Delete Button for Sections */
@@ -202,6 +216,11 @@
             border-color: #4B0082;
             box-shadow: 0 8px 16px rgba(75, 0, 130, 0.2);
             transform: translateY(-2px);
+        }
+
+        /* Hidden state */
+        .section.collapsed .editable-div {
+            display: none;
         }
 
         /* Delete Button for Editable Divs */
@@ -290,6 +309,16 @@
             sectionName.textContent = name;
             sectionName.addEventListener('input', saveSections);
 
+            // Add collapse button for the section
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'section-toggle-button';
+            toggleButton.textContent = '➖';
+            toggleButton.addEventListener('click', () => {
+                newSection.classList.toggle('collapsed');
+                toggleButton.textContent = newSection.classList.contains('collapsed') ? '➕' : '➖';
+                saveSections();
+            })
+
             // Add delete button for the section
             const deleteButton = document.createElement('button');
             deleteButton.innerHTML = ` <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="25" height="25" viewBox="0 0 120 120">
@@ -298,9 +327,16 @@
             deleteButton.className = 'section-delete-button';
             deleteButton.addEventListener('click', () => deleteSection(newSection));
 
+            newSection.appendChild(toggleButton);
             newSection.appendChild(sectionName);
             newSection.appendChild(deleteButton);
             container.appendChild(newSection);
+
+            // Make section draggable
+            newSection.setAttribute('draggable', true);
+            newSection.addEventListener('dragstart', dragStartSection);
+            newSection.addEventListener('dragover', dragOverSection);
+            newSection.addEventListener('drop', dropSection);
             return newSection;
         };
 
@@ -404,6 +440,22 @@
             if (draggedElement !== this) {
                 const targetSection = this.closest('.section');
                 targetSection.insertBefore(draggedElement, this);
+                saveSections();
+            }
+        }
+
+        let draggedSection;
+        function dragStartSection(event) {
+            draggedSection = this;
+            event.dataTransfer.effectAllowed = 'move';
+        }
+        function dragOverSection(event) {
+            event.preventDefault();
+        }
+        function dropSection(event) {
+            event.preventDefault();
+            if (draggedSection !== this) {
+                container.insertBefore(draggedSection, this);
                 saveSections();
             }
         }
