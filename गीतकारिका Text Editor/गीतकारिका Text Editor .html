@@ -333,10 +333,10 @@
             container.appendChild(newSection);
 
             // Make section draggable
-            newSection.setAttribute('draggable', true);
-            newSection.addEventListener('dragstart', dragStartSection);
-            newSection.addEventListener('dragover', dragOverSection);
-            newSection.addEventListener('drop', dropSection);
+            // newSection.setAttribute('draggable', true);
+            // newSection.addEventListener('dragstart', dragStartSection);
+            // newSection.addEventListener('dragover', dragOverSection);
+            // newSection.addEventListener('drop', dropSection);
             return newSection;
         };
 
@@ -444,21 +444,21 @@
             }
         }
 
-        let draggedSection;
-        function dragStartSection(event) {
-            draggedSection = this;
-            event.dataTransfer.effectAllowed = 'move';
-        }
-        function dragOverSection(event) {
-            event.preventDefault();
-        }
-        function dropSection(event) {
-            event.preventDefault();
-            if (draggedSection !== this) {
-                container.insertBefore(draggedSection, this);
-                saveSections();
-            }
-        }
+        // let draggedSection;
+        // function dragStartSection(event) {
+        //     draggedSection = this;
+        //     event.dataTransfer.effectAllowed = 'move';
+        // }
+        // function dragOverSection(event) {
+        //     event.preventDefault();
+        // }
+        // function dropSection(event) {
+        //     event.preventDefault();
+        //     if (draggedSection !== this) {
+        //         container.insertBefore(draggedSection, this);
+        //         saveSections();
+        //     }
+        // }
 
         // Toggle sidebar collapse
         toggleSidebarBtn.addEventListener('click', () => {
