@@ -129,8 +129,10 @@
         /* Container for Sections */
         #container {
             display: flex;
-            flex-wrap: wrap; /* Allow sections to wrap into rows */
-            gap: 20px; /* Space between sections */
+            flex-wrap: wrap;
+            /* Allow sections to wrap into rows */
+            gap: 20px;
+            /* Space between sections */
         }
 
         /* Section Divs */
@@ -140,11 +142,15 @@
             background-color: #f9f9f9;
             border-radius: 8px;
             min-height: 100px;
-            min-width: 300px; /* Minimum width for sections */
-            resize: both; /* Make sections resizable */
-            overflow: auto; /* Handle overflow when resized */
+            min-width: 300px;
+            /* Minimum width for sections */
+            resize: both;
+            /* Make sections resizable */
+            overflow: auto;
+            /* Handle overflow when resized */
             position: relative;
-            flex: 1 1 300px; /* Flex-grow, flex-shrink, flex-basis */
+            flex: 1 1 300px;
+            /* Flex-grow, flex-shrink, flex-basis */
             box-sizing: border-box;
         }
 
@@ -346,7 +352,7 @@
             newDiv.className = 'editable-div';
             newDiv.setAttribute('contenteditable', 'true');
             newDiv.setAttribute('draggable', 'true');
-            newDiv.textContent = text;
+            newDiv.innerHTML = text;
             newDiv.dataset.id = id;
 
             // Delete button inside each div
@@ -374,7 +380,7 @@
                 name: section.querySelector('.section-name').textContent,
                 divs: Array.from(section.children).filter(child => child.classList.contains('editable-div')).map(div => ({
                     id: div.dataset.id,
-                    text: div.childNodes[0].textContent
+                    text: div.innerHTML
                 }))
             }));
             localStorage.setItem('sections', JSON.stringify(sections));
