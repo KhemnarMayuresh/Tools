@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Compare Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        #compare-btn {
+            display: block;
+            margin: 20px auto 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button {
+            background: green;
+            color: white;
+            border-radius: 7px;
+        }
+
+        .inputs {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        textarea {
+            width: 48%;
+            height: 300px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+
+        .output {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .options {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            height: 30px;
+        }
+
+        .result {
+            width: 48%;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .added {
+            background-color: #d4fcdc;
+        }
+
+        .removed {
+            background-color: #ffdce0;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Text Compare Tool</h2>
+
+    <div class="options">
+        <h3 id="resultText">Highlighted Differences:</h3>
+        <button id="clear-all">Clear All</button>
+    </div>
+
+    <div class="output" id="output" style="display: none;">
+        <div id="result1" class="result"></div>
+        <div id="result2" class="result"></div>
+    </div>
+
+    <button id="compare-btn">Compare</button>
+    <div class="inputs">
+        <textarea id="text1" placeholder="Enter first text..."></textarea>
+        <textarea id="text2" placeholder="Enter second text..."></textarea>
+    </div>
+
+
+    <script>
+        function escapeHTML(str) {
+            return str.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/ /g, '&nbsp;')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Longest Common Subsequence
+        function lcs(a, b) {
+            const dp = Array(a.length + 1).fill(null).map(() => Array(b.length + 1).fill(0));
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    if (a[i - 1] === b[j - 1]) {
+                        dp[i][j] = dp[i - 1][j - 1] + 1;
+                    } else {
+                        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                    }
+                }
+            }
+
+            let i = a.length, j = b.length;
+            const sequence = [];
+
+            while (i > 0 && j > 0) {
+                if (a[i - 1] === b[j - 1]) {
+                    sequence.unshift({ type: 'same', char: a[i - 1] });
+                    i--; j--;
+                } else if (dp[i - 1][j] >= dp[i][j - 1]) {
+                    sequence.unshift({ type: 'removed', char: a[i - 1] });
+                    i--;
+                } else {
+                    sequence.unshift({ type: 'added', char: b[j - 1] });
+                    j--;
+                }
+            }
+
+            while (i > 0) {
+                sequence.unshift({ type: 'removed', char: a[i - 1] });
+                i--;
+            }
+            while (j > 0) {
+                sequence.unshift({ type: 'added', char: b[j - 1] });
+                j--;
+            }
+
+            return sequence;
+        }
+
+        document.getElementById('compare-btn').addEventListener('click', () => {
+            const text1 = document.getElementById('text1').value;
+            const text2 = document.getElementById('text2').value;
+
+            const diff = lcs(text1, text2);
+
+            let result1 = '';
+            let result2 = '';
+            let hasDifference = false;
+
+            diff.forEach(item => {
+                const safeChar = escapeHTML(item.char);
+                if (item.type === 'same') {
+                    result1 += safeChar;
+                    result2 += safeChar;
+                } else if (item.type === 'removed') {
+                    result1 += `<span class="removed">${safeChar}</span>`;
+                    hasDifference = true;
+                } else if (item.type === 'added') {
+                    result2 += `<span class="added">${safeChar}</span>`;
+                    hasDifference = true;
+                }
+            });
+
+            if (!hasDifference) {
+                document.getElementById('resultText').innerHTML = 'The two texts are identical!';
+                document.getElementById('resultText').style.color = 'green';
+                document.getElementById('output').style.display = 'none';
+                document.getElementById('result1').innerHTML = '';
+                document.getElementById('result2').innerHTML = '';
+            } else {
+                document.getElementById('resultText').innerHTML = 'Highlighted Differences:';
+                document.getElementById('resultText').style.color = 'black';
+                document.getElementById('output').style.display = 'flex';
+                document.getElementById('result1').innerHTML = result1;
+                document.getElementById('result2').innerHTML = result2;
+            }
+        });
+
+        document.getElementById('clear-all').addEventListener('click', () => {
+            document.getElementById('text1').value = '';
+            document.getElementById('text2').value = ''
+            document.getElementById('result1').innerHTML = '';
+            document.getElementById('result2').innerHTML = '';
+            document.getElementById('resultText').innerHTML = '';
+            const outputDivs = document.getElementById('output');
+            outputDivs.style.display = 'none';
+            // document.getElementById('resultText').style.color = 'green';
+        });
+    </script>
+</body>
+
+</html>
