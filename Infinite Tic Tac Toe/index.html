@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .controls label,
+        .controls select,
+        .controls input,
+        .controls button {
+            margin: 5px;
+        }
+
+        button:disabled,
+        select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button.hidden {
+            display: none;
+        }
+
+        #board {
+            display: grid;
+            gap: 2px;
+            max-width: 90vw;
+            max-height: 60vh;
+            overflow: auto;
+            border: 2px solid #ccc;
+            padding: 10px;
+            background: white;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #aaa;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .X {
+            color: #e63946;
+        }
+
+        .O {
+            color: #457b9d;
+        }
+
+        .highlight {
+            border: 2px dashed #f4a261;
+            background-color: #ffe8cc;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* New CSS for showing and hiding buttons */
+        #pauseBtn,
+        #restartBtn {
+            display: none;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Infinite Tic Tac Toe</h1>
+    <div class="controls">
+        <label>Grid Size:
+            <select id="gridSize">
+                <option value="3" selected>3 x 3</option>
+                <option value="4">4 x 4</option>
+                <option value="5">5 x 5</option>
+                <option value="6">6 x 6</option>
+                <option value="7">7 x 7</option>
+                <option value="8">8 x 8</option>
+                <option value="9">9 x 9</option>
+                <option value="10">10 x 10</option>
+            </select>
+        </label>
+        <label><input type="checkbox" id="aiToggle" /> Play vs Computer</label>
+        <label id="difficultyLabel" style="display: none;">Difficulty:
+            <select id="difficulty">
+                <option value="0">0 (Easy)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5" selected>5 (Hard)</option>
+            </select>
+        </label>
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn" class="hidden">Pause</button>
+        <button id="restartBtn" class="hidden">Restart</button>
+    </div>
+    <div id="board"></div>
+    <div class="status" id="status">Click Start to play</div>
+
+    <script>
+        const board = document.getElementById('board');
+        const statusDiv = document.getElementById('status');
+        const aiToggle = document.getElementById('aiToggle');
+        const difficulty = document.getElementById('difficulty');
+        const gridSizeSelect = document.getElementById('gridSize');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const difficultyLabel = document.getElementById('difficultyLabel');
+
+        let SIZE = 10;
+        let currentPlayer = 'X';
+        let boardState = [];
+        let gameOver = false;
+        let gameStarted = false;
+        let paused = false;
+        let playerMoves = { X: [], O: [] };
+
+        function initializeBoardState() {
+            boardState = Array.from({ length: SIZE }, () => Array(SIZE).fill(''));
+            playerMoves = { X: [], O: [] };
+        }
+
+        function createBoard() {
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${SIZE}, 50px)`;
+            for (let row = 0; row < SIZE; row++) {
+                for (let col = 0; col < SIZE; col++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    board.appendChild(cell);
+                }
+            }
+            board.querySelectorAll('.cell').forEach(cell => cell.addEventListener('click', handleCellClick));
+        }
+
+        function handleCellClick(e) {
+            //A move is only made if the game is started, not over, and not paused.
+            if (!gameStarted || gameOver || paused) return;
+
+            const row = +e.target.dataset.row;
+            const col = +e.target.dataset.col;
+            console.log(`row ${row} col ${col} for player ${currentPlayer}`);
+            if (boardState[row][col] !== '') return;
+
+            //If a player has already placed three moves, the oldest move is removed.
+            const moves = playerMoves[currentPlayer];
+            if (moves.length === SIZE) {
+                const { row: oldRow, col: oldCol } = moves.shift();
+                boardState[oldRow][oldCol] = '';
+                const oldCell = document.querySelector(`[data-row='${oldRow}'][data-col='${oldCol}']`);
+                oldCell.textContent = '';
+                oldCell.classList.remove(currentPlayer);
+                oldCell.classList.remove('highlight');
+            }
+
+            boardState[row][col] = currentPlayer;
+            e.target.textContent = currentPlayer;
+            e.target.classList.add(currentPlayer);
+            playerMoves[currentPlayer].push({ row, col });
+
+            // Highlight the oldest move to indicate it's next to be removed
+            const allCells = document.querySelectorAll('.cell');
+            allCells.forEach(c => c.classList.remove('highlight'));
+            const other = currentPlayer === 'X' ? 'O' : 'X';
+            if (playerMoves[other].length === 3) {
+                const nextToRemove = playerMoves[other][0];
+                const highlightCell = document.querySelector(`[data-row='${nextToRemove.row}'][data-col='${nextToRemove.col}']`);
+                highlightCell.classList.add('highlight');
+            }
+
+            //It checks if the player has won after every move.
+            if (checkWinner(row, col, currentPlayer)) {
+                alert(`${currentPlayer} wins!`);
+                statusDiv.textContent = `${currentPlayer} wins!`;
+                gameOver = true;
+                pauseBtn.style.display = 'none';
+                return;
+            }
+
+            // tie logic
+            if (playerMoves.X.length + playerMoves.O.length >= 15) {
+                statusDiv.textContent = 'It\'s a tie!';
+                gameOver = true;
+                return;
+            }
+
+            // Switches turns between players (X and O).
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDiv.textContent = `${currentPlayer}'s turn`;
+
+            // If playing against the computer (AI), the AI makes its move after the player's turn.
+            if (aiToggle.checked && currentPlayer === 'O') {
+                setTimeout(aiMove, 300);
+            }
+        }
+
+        function checkWinner(r, c, player) {
+            return (
+                checkDirection(r, c, 1, 0, player) ||
+                checkDirection(r, c, 0, 1, player) ||
+                checkDirection(r, c, 1, 1, player) ||
+                checkDirection(r, c, 1, -1, player)
+            );
+        }
+
+        function checkDirection(r, c, dr, dc, player) {
+            let count = 1;// Start with the current move already counted
+
+            // Check one direction (forward)
+            for (let i = 1; i < SIZE; i++) {
+                const newRow = r + dr * i;
+                const newCol = c + dc * i;
+                if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && boardState[newRow][newCol] === player) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            // Check the opposite direction (backward)
+            for (let i = 1; i < SIZE; i++) {
+                const newRow = r - dr * i;
+                const newCol = c - dc * i;
+                if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && boardState[newRow][newCol] === player) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            // If count is size or more, return true
+            return count >= SIZE;
+        }
+
+        function aiMove() {
+            if (!gameStarted || paused || gameOver) return;
+            let level = +difficulty.value;
+            let move = findBestMove(level);
+            if (!move) return;
+            const { row, col } = move;
+            const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
+            handleCellClick({ target: cell });
+        }
+
+        function findBestMove(level) {
+            let emptyCells = [];
+            boardState.forEach((row, r) => row.forEach((val, c) => {
+                if (!val) emptyCells.push({ row: r, col: c });
+            }));
+
+            // Level 0–1: Random move
+            if (level <= 1) {
+                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            }
+
+            // Helper to simulate a move
+            const simulateMove = (r, c, player) => {
+                boardState[r][c] = player;
+                const win = checkWinner(r, c, player);
+                boardState[r][c] = ''; // Reset
+                return win;
+            };
+
+            // Level 2–3: Block opponent's win
+            if (level <= 3) {
+                for (let { row, col } of emptyCells) {
+                    if (simulateMove(row, col, 'X')) return { row, col }; // block player
+                }
+                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            }
+
+            // Level 4: Try to win, else block
+            if (level === 4) {
+                for (let { row, col } of emptyCells) {
+                    if (simulateMove(row, col, 'O')) return { row, col }; // win
+                }
+                for (let { row, col } of emptyCells) {
+                    if (simulateMove(row, col, 'X')) return { row, col }; // block
+                }
+                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            }
+
+            // Level 5: Greedy + Win + Block + Center/Edge preference
+            if (level === 5) {
+                for (let { row, col } of emptyCells) {
+                    if (simulateMove(row, col, 'O')) return { row, col }; // win
+                }
+                for (let { row, col } of emptyCells) {
+                    if (simulateMove(row, col, 'X')) return { row, col }; // block
+                }
+
+                // Prefer center
+                const center = Math.floor(SIZE / 2);
+                const centerCell = emptyCells.find(({ row, col }) => row === center && col === center);
+                if (centerCell) return centerCell;
+
+                // Prefer cells near existing 'O'
+                for (let { row, col } of emptyCells) {
+                    const nearO = [-1, 0, 1].some(dr =>
+                        [-1, 0, 1].some(dc => {
+                            const r = row + dr, c = col + dc;
+                            return r >= 0 && c >= 0 && r < SIZE && c < SIZE && boardState[r][c] === 'O';
+                        })
+                    );
+                    if (nearO) return { row, col };
+                }
+
+                // fallback
+                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            }
+
+            return null;
+        }
+
+
+        aiToggle.addEventListener('change', () => {
+            difficultyLabel.style.display = aiToggle.checked ? 'inline-block' : 'none';
+        });
+
+        startBtn.addEventListener('click', () => {
+            SIZE = parseInt(gridSizeSelect.value);
+            initializeBoardState();
+            createBoard();
+            currentPlayer = 'X';
+            gameOver = false;
+            gameStarted = true;
+            paused = false;
+            statusDiv.textContent = `${currentPlayer}'s turn`;
+            pauseBtn.style.display = 'inline-block';
+            restartBtn.style.display = 'inline-block';
+            gridSizeSelect.disabled = true;
+            startBtn.style.display = 'none';
+            difficulty.disabled = true;
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (!gameStarted) return;
+            paused = !paused;
+            pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+            statusDiv.textContent = paused ? 'Game Paused' : `${currentPlayer}'s turn`;
+        });
+
+        restartBtn.addEventListener('click', () => {
+            if (!gameStarted) return;
+            initializeBoardState();
+            createBoard();
+            currentPlayer = 'X';
+            gameOver = false;
+            paused = false;
+            statusDiv.textContent = `${currentPlayer}'s turn`;
+            pauseBtn.textContent = 'Pause';
+            gridSizeSelect.disabled = false;
+            difficulty.disabled = false;
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+            restartBtn.style.display = 'none';
+        });
+
+    </script>
+</body>
+
+</html>
