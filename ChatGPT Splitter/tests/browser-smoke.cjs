@@ -1,0 +1,135 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const http = require('node:http');
+const {chromium} = require(process.env.PLAYWRIGHT_PATH || 'playwright');
+const root = path.resolve(__dirname, '..');
+const server = http.createServer((req, res) => {
+  const pathname = decodeURIComponent(req.url.split('?')[0]);
+  const target = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
+  if (!target.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
+  fs.readFile(target, (error, data) => {
+    if (error) { res.writeHead(404).end(); return; }
+    res.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : 'text/html');
+    res.end(data);
+  });
+});
+(async () => {
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const browser = await chromium.launch({channel: process.env.BROWSER_CHANNEL || 'msedge', headless: true});
+  const context = await browser.newContext({viewport: {width: 1280, height: 1000}, permissions: ['clipboard-read', 'clipboard-write']});
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  async function clipboard() { return (await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n'); }
+  async function generation() {
+    await page.locator('#splitButton').click();
+    await page.waitForFunction(() => document.querySelector('#status').textContent !== 'Generating messages…');
+    assert.equal(await page.locator('#output').isVisible(), true, await page.locator('#status').innerText());
+  }
+  async function copyNext() {
+    await page.locator('#copyNext').click();
+    await page.waitForFunction(() => !document.querySelector('#copyNext').disabled || document.querySelector('#copyNext').textContent === 'Sequence copied');
+  }
+  try {
+    await page.goto('http://127.0.0.1:' + server.address().port);
+    await page.locator('summary').click();
+    await page.locator('#template').fill('Receive {totalParts} parts.');
+    await page.locator('#finalTask').fill('Process it.');
+    await page.locator('#charLimit').fill('220');
+    const source = ('<img src=x onerror="window.INJECTED=1"> हिन्दी 👩🏽‍💻 words.\n\n').repeat(8);
+    await page.locator('#prompt').fill(source);
+    await generation();
+    assert.equal(await page.locator('#splitParts img').count(), 0);
+    assert.equal(await page.evaluate(() => window.INJECTED), undefined);
+    await copyNext();
+    assert.equal(await clipboard(), await page.locator('#message-0').inputValue());
+    assert.match(await page.locator('#copyNext').innerText(), /Copy part 1/);
+    await page.locator('[data-message="2"] .copy-button').click();
+    await page.waitForFunction(() => document.querySelector('[data-message="2"] .card-flags').textContent.includes('Copied'));
+    assert.match(await page.locator('#copyNext').innerText(), /Copy part 1/);
+    const copied = await clipboard();
+    assert.ok(copied.includes('[START PART 2/'));
+    assert.ok(!copied.includes('<pre>') && !copied.includes('<br>'));
+    await page.locator('#message-2').fill('Edited 😀 <b>literal</b>');
+    assert.ok(!(await page.locator('[data-message="2"] .card-flags').innerText()).includes('Copied'));
+    await page.locator('[data-message="2"] .copy-button').click();
+    await page.waitForFunction(() => document.querySelector('[data-message="2"] .card-flags').textContent.includes('Copied'));
+    const editedClipboard=await clipboard();assert.ok(editedClipboard.includes('\nEdited 😀 <b>literal</b>\n'), JSON.stringify(editedClipboard));
+    await page.locator('#message-2').fill('x'.repeat(230));
+    assert.equal(await page.locator('[data-message="2"] .copy-button').isDisabled(), true);
+    assert.match(await page.locator('[data-message="2"] .card-counters').innerText(), /over limit/);
+    await page.locator('#message-2').fill('Valid edit');
+    await page.evaluate(() => { window.realWrite = navigator.clipboard.writeText.bind(navigator.clipboard); navigator.clipboard.writeText = () => Promise.reject(new Error('denied')); });
+    await page.locator('#copyNext').click();
+    await page.waitForFunction(() => !document.querySelector('#manualCopy').hidden);
+    assert.match(await page.locator('#copyNext').innerText(), /Copy part 1/);
+    await page.locator('#markCopied').click();
+    assert.match(await page.locator('#copyNext').innerText(), /Copy part 2/);
+    await page.evaluate(() => navigator.clipboard.writeText = window.realWrite);
+    await copyNext();
+    await page.locator('#message-0').fill('Edited initial instructions');
+    assert.equal(await page.locator('#copyNext').innerText(), 'Copy initial instructions');
+    await page.locator('#prompt').fill('New source');
+    assert.equal(await page.locator('#copyNext').isDisabled(), true);
+    await page.locator('#splitButton').click();
+    assert.equal(await page.locator('#confirmRegenerate').isVisible(), true);
+    await page.locator('#keepEdits').click();
+    assert.equal(await page.locator('#message-2').inputValue(), 'Valid edit');
+    await page.locator('#splitButton').click();
+    await page.evaluate(() => { document.querySelector('#replaceEdits').click(); const editor=document.querySelector('#message-2');editor.value='Edit while generating';editor.dispatchEvent(new Event('input',{bubbles:true})); });
+    assert.equal(await page.locator('#splitButton').isDisabled(), false, 'Editing old output must cancel obsolete generation');
+    await page.locator('#splitButton').click();
+    await page.locator('#replaceEdits').click();
+    await page.waitForFunction(() => document.querySelector('#status').textContent !== 'Generating messages…');
+    assert.match(await page.locator('#summary').innerText(), /^1 part/);
+    await copyNext(); await copyNext();
+    assert.equal(await page.locator('#copyNext').innerText(), 'Sequence copied');
+    assert.equal(await page.locator('#copyNext').isDisabled(), true);
+    const final = await clipboard();
+    assert.ok(final.endsWith('ALL PARTS SENT\nProcess it.'));
+    await page.locator('#restart').click();
+    assert.match(await page.locator('#progress').innerText(), /^0 of/);
+    await page.locator('#profile').selectOption('claude');
+    assert.equal(await page.locator('#charLimit').inputValue(), '12000');
+    assert.equal(await page.locator('#copyNext').isDisabled(), true);
+    await page.locator('#charLimit').fill('100');
+    await page.locator('#template').fill(''); await page.locator('#finalTask').fill('');
+    await page.locator('#prompt').fill('x'.repeat(3500));
+    await generation();
+    assert.equal(await page.locator('#splitParts article').count(), 25);
+    await page.locator('#loadMore').click();
+    assert.equal(await page.locator('#splitParts article').count(), 50);
+    await page.locator('#theme').selectOption('dark');
+    assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({path: path.join(root, 'tests/desktop.png'), fullPage: false});
+    await page.setViewportSize({width: 375, height: 812});
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({path: path.join(root, 'tests/mobile.png'), fullPage: false});
+    await page.evaluate(() => { window.copyCalls = 0; navigator.clipboard.writeText = () => { window.copyCalls++; return new Promise(resolve => window.resolveCopy = resolve); }; document.querySelector('#copyNext').click(); document.querySelector('#copyNext').click(); });
+    assert.equal(await page.evaluate(() => window.copyCalls), 1);
+    await page.locator('#clear').click();
+    await page.evaluate(() => window.resolveCopy());
+    await page.waitForTimeout(100);
+    assert.equal(await page.locator('#output').isVisible(), false);
+    assert.equal(await page.locator('#status').innerText(), 'Ready to split.');
+    const stored = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)])));
+    assert.ok(Object.keys(stored).every(k => ['splitter-theme', 'splitter-profiles'].includes(k)));
+    await page.locator('#charLimit').fill('0');
+    await page.locator('#splitButton').click();
+    assert.match(await page.locator('#status').innerText(), /integer/);
+    await page.locator('#charLimit').fill('12000');
+    await page.locator('#prompt').fill('test');
+    await page.evaluate(() => { document.querySelector('#splitButton').click(); document.querySelector('#cancelGeneration').click(); });
+    await page.waitForTimeout(100);
+    assert.equal(await page.locator('#status').innerText(), 'Generation cancelled.');
+    await page.goto('file:///' + path.join(root, 'index.html').replaceAll('\\', '/'));
+    await page.locator('#prompt').fill('Direct file input');
+    await generation();
+    assert.equal(await page.locator('#message-1').inputValue(), 'Direct file input');
+    assert.deepEqual(errors, []);
+    console.log('Browser checks passed: literal copy, edits/counters, copy sequence, denied clipboard/manual confirmation, stale state, regenerate confirmation, paging, profiles/themes, mobile, async clear, cancel, direct-file fallback.');
+  } finally { await browser.close(); server.close(); }
+})().catch(error => { console.error(error.message); server.close(); process.exitCode = 1; });

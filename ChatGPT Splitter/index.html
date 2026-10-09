@@ -1,32 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ChatGPT Prompts Splitter</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>ChatGPT Prompts Splitter</h1>
-      <label for="prompt">Enter your long prompt here:</label>
-      <textarea id="prompt"></textarea>
-      <label for="charLimit">Character limit:</label>
-      <input
-        type="number"
-        id="charLimit"
-        name="charLimit"
-        value="12000"
-        min="50"
-        max="15000"
-        step="50"
-      />
-      <div id="charCount"></div>
-      <button id="splitButton">Split Text</button>
-      <div id="splitParts"></div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Split long text into editable plain-text messages, locally in your browser.">
+  <title>ChatGPT Splitter</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='50'%3E%E2%9C%82%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<main>
+  <header>
+    <div><p class="eyebrow">LOCAL TEXT UTILITY</p><h1>ChatGPT Splitter</h1><p class="muted">Keep your words together. Copy manageable messages, one at a time.</p></div>
+    <label>Theme <select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+  </header>
+  <section class="panel">
+    <div class="section-title"><label for="prompt">Your source text</label><span id="charCount" class="muted"></span></div>
+    <textarea id="prompt" placeholder="Paste the complete text here…" spellcheck="false"></textarea>
+    <p class="hint">Up to 2 MiB. Your text stays in this browser and is never saved automatically.</p>
+  </section>
+  <section class="panel settings" aria-label="Message settings">
+    <div class="config-grid">
+      <label>Profile <select id="profile"><option value="manual">Manual</option><option value="chatgpt">ChatGPT</option><option value="claude">Claude</option><option value="gemini">Gemini</option><option value="custom">Custom</option></select></label>
+      <label for="charLimit">Complete message limit <input id="charLimit" type="number" min="50" max="1000000" step="1" value="12000"></label>
+      <label>Sentence language <select id="locale"><option value="en">English</option><option value="hi">Hindi</option><option value="und">Automatic / other</option></select></label>
+      <label class="check"><input id="smartSplit" type="checkbox" checked> Prefer paragraphs, sentences, and words</label>
     </div>
-
-    <script src="scripts.js"></script>
-  </body>
+    <p class="hint">The limit includes labels and final instructions. Profiles remember your chosen character budgets; they do not represent model context windows.</p>
+    <details><summary>Initial instructions & final task</summary>
+      <label for="template">Initial instructions template</label><textarea id="template" class="small-editor" spellcheck="false"></textarea>
+      <p class="hint">Use {totalParts} for the generated part count. Other text stays literal.</p>
+      <label for="finalTask">Final task, appended to the last part</label><textarea id="finalTask" class="small-editor" spellcheck="false"></textarea>
+    </details>
+  </section>
+  <div class="actions"><button id="splitButton" class="primary">Generate parts</button><button id="cancelGeneration" hidden>Cancel generation</button><button id="clear">Clear all</button></div>
+  <p id="status" role="status" aria-live="polite">Ready to split.</p>
+  <div id="confirmRegenerate" class="notice" hidden role="group" aria-labelledby="confirmTitle"><strong id="confirmTitle">Replace edited messages?</strong><p>Generating again replaces your edited parts and initial message and resets copy progress.</p><button id="replaceEdits">Replace and generate</button><button id="keepEdits">Keep my edits</button></div>
+  <section id="output" hidden aria-label="Generated messages">
+    <div class="output-header"><div><h2 id="summary"></h2><p id="stale" class="error" hidden>Output is stale. Generate again before copying.</p></div><div class="actions"><button id="copyNext" class="primary">Copy initial instructions</button><button id="restart">Restart copy sequence</button></div></div>
+    <p id="progress" class="muted"></p>
+    <div id="manualCopy" class="notice" hidden><label for="fallbackText">Clipboard unavailable. Copy this selected message manually.</label><textarea id="fallbackText" readonly></textarea><button id="markCopied">Mark this message copied</button><button id="dismissFallback">Dismiss</button></div>
+    <div id="initialCard"></div>
+    <div id="splitParts"></div>
+    <button id="loadMore" hidden>Load 25 more parts</button>
+  </section>
+  <footer>Ctrl/⌘+Enter: generate · Token estimates are approximate (characters ÷ 4), not tokenizer counts. Language and model affect accuracy. “Copied” does not mean sent to an AI app.</footer>
+</main>
+<script src="split-core.js"></script>
+<script src="scripts.js"></script>
+</body>
 </html>
