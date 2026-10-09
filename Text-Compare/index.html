@@ -1,204 +1,110 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Text Compare Tool</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f0f0f0;
-        }
-
-        h2 {
-            text-align: center;
-        }
-
-        #compare-btn {
-            display: block;
-            margin: 20px auto 10px auto;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button {
-            background: green;
-            color: white;
-            border-radius: 7px;
-        }
-
-        .inputs {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        textarea {
-            width: 48%;
-            height: 300px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            resize: vertical;
-        }
-
-        .output {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .options {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            height: 30px;
-        }
-
-        .result {
-            width: 48%;
-            padding: 10px;
-            background: white;
-            border: 1px solid #ccc;
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .added {
-            background-color: #d4fcdc;
-        }
-
-        .removed {
-            background-color: #ffdce0;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Compare text and code locally with line differences and unified patch export.">
+<title>Text Compare</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='50'%3E%C2%B1%3C/text%3E%3C/svg%3E">
 </head>
-
 <body>
-    <h2>Text Compare Tool</h2>
-
-    <div class="options">
-        <h3 id="resultText">Highlighted Differences:</h3>
-        <button id="clear-all">Clear All</button>
-    </div>
-
-    <div class="output" id="output" style="display: none;">
-        <div id="result1" class="result"></div>
-        <div id="result2" class="result"></div>
-    </div>
-
-    <button id="compare-btn">Compare</button>
-    <div class="inputs">
-        <textarea id="text1" placeholder="Enter first text..."></textarea>
-        <textarea id="text2" placeholder="Enter second text..."></textarea>
-    </div>
-
-
-    <script>
-        function escapeHTML(str) {
-            return str.replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/ /g, '&nbsp;')
-                .replace(/\n/g, '<br>');
-        }
-
-        // Longest Common Subsequence
-        function lcs(a, b) {
-            const dp = Array(a.length + 1).fill(null).map(() => Array(b.length + 1).fill(0));
-
-            for (let i = 1; i <= a.length; i++) {
-                for (let j = 1; j <= b.length; j++) {
-                    if (a[i - 1] === b[j - 1]) {
-                        dp[i][j] = dp[i - 1][j - 1] + 1;
-                    } else {
-                        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-                    }
-                }
-            }
-
-            let i = a.length, j = b.length;
-            const sequence = [];
-
-            while (i > 0 && j > 0) {
-                if (a[i - 1] === b[j - 1]) {
-                    sequence.unshift({ type: 'same', char: a[i - 1] });
-                    i--; j--;
-                } else if (dp[i - 1][j] >= dp[i][j - 1]) {
-                    sequence.unshift({ type: 'removed', char: a[i - 1] });
-                    i--;
-                } else {
-                    sequence.unshift({ type: 'added', char: b[j - 1] });
-                    j--;
-                }
-            }
-
-            while (i > 0) {
-                sequence.unshift({ type: 'removed', char: a[i - 1] });
-                i--;
-            }
-            while (j > 0) {
-                sequence.unshift({ type: 'added', char: b[j - 1] });
-                j--;
-            }
-
-            return sequence;
-        }
-
-        document.getElementById('compare-btn').addEventListener('click', () => {
-            const text1 = document.getElementById('text1').value;
-            const text2 = document.getElementById('text2').value;
-
-            const diff = lcs(text1, text2);
-
-            let result1 = '';
-            let result2 = '';
-            let hasDifference = false;
-
-            diff.forEach(item => {
-                const safeChar = escapeHTML(item.char);
-                if (item.type === 'same') {
-                    result1 += safeChar;
-                    result2 += safeChar;
-                } else if (item.type === 'removed') {
-                    result1 += `<span class="removed">${safeChar}</span>`;
-                    hasDifference = true;
-                } else if (item.type === 'added') {
-                    result2 += `<span class="added">${safeChar}</span>`;
-                    hasDifference = true;
-                }
-            });
-
-            if (!hasDifference) {
-                document.getElementById('resultText').innerHTML = 'The two texts are identical!';
-                document.getElementById('resultText').style.color = 'green';
-                document.getElementById('output').style.display = 'none';
-                document.getElementById('result1').innerHTML = '';
-                document.getElementById('result2').innerHTML = '';
-            } else {
-                document.getElementById('resultText').innerHTML = 'Highlighted Differences:';
-                document.getElementById('resultText').style.color = 'black';
-                document.getElementById('output').style.display = 'flex';
-                document.getElementById('result1').innerHTML = result1;
-                document.getElementById('result2').innerHTML = result2;
-            }
-        });
-
-        document.getElementById('clear-all').addEventListener('click', () => {
-            document.getElementById('text1').value = '';
-            document.getElementById('text2').value = ''
-            document.getElementById('result1').innerHTML = '';
-            document.getElementById('result2').innerHTML = '';
-            document.getElementById('resultText').innerHTML = '';
-            const outputDivs = document.getElementById('output');
-            outputDivs.style.display = 'none';
-            // document.getElementById('resultText').style.color = 'green';
-        });
-    </script>
+<main>
+<header>
+<div>
+<p class="eyebrow">LOCAL TEXT & CODE UTILITY</p>
+<h1>Text Compare</h1>
+<p>See what changed. Your text stays in this browser.</p>
+</div>
+<label>Theme <select id="theme">
+<option value="system">System</option>
+<option value="light">Light</option>
+<option value="dark">Dark</option>
+</select>
+</label>
+</header>
+<section class="inputs" aria-label="Texts to compare">
+<div class="input-panel" data-side="old">
+<div class="panel-title">
+<label for="old">Original</label>
+<label class="file-button">Open file<input id="old-file" type="file" aria-label="Open original file">
+</label>
+</div>
+<textarea id="old" spellcheck="false" placeholder="Paste original text or drop a UTF-8 file">
+</textarea>
+<small id="old-info">Paste text or drop a file · up to 2 MiB</small>
+</div>
+<div class="input-panel" data-side="new">
+<div class="panel-title">
+<label for="new">Modified</label>
+<label class="file-button">Open file<input id="new-file" type="file" aria-label="Open modified file">
+</label>
+</div>
+<textarea id="new" spellcheck="false" placeholder="Paste modified text or drop a UTF-8 file">
+</textarea>
+<small id="new-info">Paste text or drop a file · up to 2 MiB</small>
+</div>
+</section>
+<div class="toolbar">
+<button id="compare" class="primary">Compare</button>
+<button id="cancel" hidden>Cancel</button>
+<button id="clear">Clear all</button>
+<label>
+<input id="whitespace" type="checkbox"> Ignore spaces & tabs</label>
+<label>Language <select id="language">
+<option value="auto">Auto</option>
+<option value="plain">Plain text</option>
+<option value="javascript">JavaScript / TypeScript</option>
+<option value="json">JSON</option>
+<option value="html">HTML</option>
+<option value="css">CSS</option>
+<option value="python">Python</option>
+</select>
+</label>
+</div>
+<p id="status" role="status" aria-live="polite">Ready to compare.</p>
+<section id="review" hidden>
+<div class="review-bar">
+<strong id="summary">
+</strong>
+<label>View <select id="view">
+<option value="split">Split</option>
+<option value="unified">Unified</option>
+</select>
+</label>
+<label>Context <select id="context">
+<option value="0">0 lines</option>
+<option value="3" selected>3 lines</option>
+<option value="5">5 lines</option>
+<option value="10">10 lines</option>
+<option value="all">Full file</option>
+</select>
+</label>
+<button id="previous" title="Alt+Up">↑ Previous</button>
+<span id="position">
+</span>
+<button id="next" title="Alt+Down">↓ Next</button>
+<button id="copy">Copy patch</button>
+<button id="download">Download .diff</button>
+</div>
+<p class="hint">Patch export includes ignored whitespace and line-ending changes.</p>
+<div id="result" tabindex="0" aria-label="Comparison results">
+</div>
+<button id="more" hidden>Show more rows</button>
+<textarea id="patch-fallback" hidden readonly aria-label="Patch text for manual copying">
+</textarea>
+</section>
+<footer>Alt+↑ / Alt+↓: navigate changes · Ctrl/⌘+Enter: compare · UTF-8 files · No uploads</footer>
+</main>
+<script src="diff-core.js">
+</script>
+<script src="patch-export.js">
+</script>
+<script src="syntax.js">
+</script>
+<script src="diff-renderer.js">
+</script>
+<script src="app.js">
+</script>
 </body>
-
 </html>

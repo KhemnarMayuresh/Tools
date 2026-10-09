@@ -1,0 +1,2 @@
+const {compareLines}=require('./diff-core');
+for(const kind of ['near','different','single']){const a=kind==='single'?'a'.repeat(200000):Array.from({length:10000},(_,i)=>'line '+i).join('\n');const b=kind==='near'?a.replace('line 5000','changed 5000'):kind==='single'?'b'.repeat(200000):Array.from({length:10000},(_,i)=>'other '+i).join('\n');const start=performance.now();try{const r=compareLines(a,b);console.log(kind,Math.round(performance.now()-start)+'ms',r.additions,r.deletions);}catch(e){console.log(kind,Math.round(performance.now()-start)+'ms',e.message);}}
