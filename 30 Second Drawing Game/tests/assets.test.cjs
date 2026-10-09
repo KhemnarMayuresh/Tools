@@ -1,0 +1,3 @@
+const t=require('node:test'),a=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+t('built-in inventory has stable unique IDs and exact local asset names',()=>{const ctx={};vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(root,'Data.js'),'utf8')+';globalThis.prompts=data;globalThis.defaults=defaultSelectedCategories',ctx);const p=ctx.prompts;a.equal(p.length,129);a.equal(new Set(p.map(x=>x.id)).size,129);a.equal(new Set(p.map(x=>x.categoryId)).size,18);const files=fs.readdirSync(path.join(root,'images'));for(const x of p){a.equal(x.name,x.name.trim());a.ok(files.includes(path.basename(x.imageUrl)),x.imageUrl)}a.equal(ctx.defaults.length,5)});

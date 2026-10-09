@@ -1,69 +1,30 @@
 # 30 Second Drawing Game
 
-This is a fun and interactive web-based version of the "30 Second Drawing" game. The game is perfect for groups and encourages creativity and quick thinking!
+Open `30sDrawingGame.html` directly, or serve this folder with a static HTTP server. No backend or downloads are needed; reference images and sound generation are local.
 
-## How to Play
-1. Players select categories and names for drawing (e.g., Ice Cream, Iron Man).
-2. A word or name is randomly shown on the screen.
-3. The game starts a countdown sequence ("Ready, Set, Go!") before the timer begins.
-4. All players draw the word within the set time limit (default: 30 seconds). Players must stop drawing once the timer ends.
-5. When the timer is up, everyone compares their drawings and votes for the best one. Points can be awarded based on creativity, humor, or any other criteria.
-6. The player with the most points at the end wins the game!
+Game settings is collapsed by default. Open it to enter 1–12 unique player names, choose prompts, and set 10–120 drawing seconds. Everyone draws on paper at the same time. Ready and Set conceal the prompt; Go reveals it after two seconds and begins drawing. Players lock after starting the first round.
 
-## Live Demo
-- **Option 1**: Play directly using [htmlpreview.github.io](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/30%20Second%20Drawing%20Game/30sDrawingGame.html)
-- **Option 2**: Play via [rawcdn.githack.com](https://rawcdn.githack.com/KhemnarMayuresh/Tools/blob/main/30%20Second%20Drawing%20Game/30sDrawingGame.html)
+At time up the host selects a winner for one point, or No winner. Correct the current result before moving to Next round; changing the winner recalculates scores. Skip ends drawing without points. Each revealed prompt is used once until a reset. Cancelling preparation leaves the prompt unused.
 
-## Features
-- **Category and Name Selection**: Choose from predefined categories and their names to customize the drawing challenge.
-- **Search Functionality**: Quickly find specific names or categories using the search bar.
-- **Timer Customization**: Set the drawing time to your preferred duration.
-- **Countdown Sequence**: A fun "Ready, Set, Go!" animation prepares players before the timer starts.
-- **Reference Images**: Optionally display reference images for the word or name to help with drawing.
-- **Circular Progress Bar**: A visual representation of the remaining time.
-- **Responsive Design**: Suitable for desktop and mobile browsers.
+Reset word pool stops the round, replenishes words and keeps scores/history; a cancelled drawing attempt is recorded as aborted. New Game stops play, clears scores/history, refills words and unlocks players. Both ask for confirmation. Roster, settings, selections and custom words remain. Refresh clears game data; only theme/sound preferences are saved.
 
-## Requirements
-- A modern web browser with support for HTML5, CSS3, and JavaScript.
+Search filters words and categories without changing selections. Select all includes hidden results. Category checkboxes support partial selection. Add newline-separated custom words: up to 10 custom categories/200 words, 40 characters per category and 80 per word. Labels remain literal text. Invalid batches add nothing.
 
-## Installation
-1. Clone the repository or download the code as a ZIP file.
-2. Open the `30sDrawingGame.html` file in any modern web browser.
-3. No additional installation or setup is required.
-or Use can use demo link to use it without installation.
+Reference images default to After round; During drawing reveals them at Go. Custom words have no image; missing images never block play. Sound uses Web Audio after a user gesture and may depend on browser permissions. Mute/volume and system/light/dark themes are available. Reduced-motion preferences disable timer pulsing.
 
-## How to Use
-1. **Setup**:
-   - Open the game in your browser.
-   - Select categories and names for the drawing pool.
-   - Customize the timer duration (if desired).
+The top-right sun, moon and monitor icons select light, dark and system themes. The main page shows Game settings, the prompt/reference and timer, the scoreboard, then round history. Start round uses the current settings; it automatically closes configuration so players can focus on drawing.
 
-2. **Start the Game**:
-   - Click "Start" to begin the countdown sequence.
-   - The timer starts when "Go" appears, and players can begin drawing.
+Choose **Finish game** between rounds after resolving the result to reveal an animated top-three podium and rows for everyone else. Scores are frozen after finishing. Equal scores share a competition rank (for example 1, 1, 3); tied players appear in roster order. No points produces a celebratory completion message without claiming a sole winner. With fewer than three players, only actual players appear. **Play again** clears scores/history and reuses the current players/settings. Reduced motion disables podium and confetti animations.
 
-3. **Finish and Vote**:
-   - Once the timer ends, compare the drawings and vote for the best one.
+## Source and verification
 
-4. **Restart**:
-   - Use the Restart button to start a new round with same previous selections .
+- `Data.js`: 129 built-in prompts in 18 categories with exact-case local references.
+- `game-core.js`: pure validation, lifecycle, selection, scores and custom batches.
+- `timer-controller.js`: cancellable monotonic deadline and stale callback guards.
+- `audio.js` / `app.js`: audio and DOM effects.
 
-## Code Structure
-- **HTML**: Provides the structure of the game interface, including buttons, checkboxes, search functionality, and display sections.
-- **CSS**: Enhances the appearance with styles for layout, animations, and the circular progress bar.
-- **JavaScript**: Implements game logic:
-  - Randomly selects names.
-  - Manages countdown and timer functionality.
-  - Dynamically updates the interface based on user actions.
+Run `node --test "30 Second Drawing Game/tests/*.test.cjs"` from the repository root. Browser smoke: `node "30 Second Drawing Game/tests/browser-smoke.cjs"` with Playwright installed or `PLAYWRIGHT_PATH` pointing to its package. Redesign smoke: `node "30 Second Drawing Game/tests/redesign-smoke.cjs"` covers collapsed settings, theme icons, game completion, one/two/twelve-player results and keyboard/mobile behavior.
 
-## License
-This project is open-source and available for personal and educational use. You are welcome to modify and distribute it as needed.
+The smoke test uses Edge and a controlled clock; it opens the static page directly.
 
-## Issues & Contributions
-If you encounter any issues or have suggestions for improvements, feel free to:
-- Open an issue in the repository.
-- Submit a pull request with proposed changes.
-
----
-
-Enjoy the game and let your creativity shine!
+History is session-only and judging is manual. There is no drawing canvas, online voting or automatic scoring.
