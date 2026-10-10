@@ -2,7 +2,9 @@
 
 Split long text into editable, plain-text messages with size limits and a sequential copying workflow. Processing happens entirely in your browser; text, instructions, and edited parts are never uploaded or automatically saved.
 
-## Use
+**Quick start:** Open `index.html`, paste your text, and click **Generate parts**. Copy the initial instructions, then each part in order. Use the top-right sun, moon, or monitor icon to choose a theme.
+
+## How to Use
 
 1. Paste your source text.
 2. Choose a profile and complete-message character limit. Expand **Initial instructions & final task** to customize the introductory message or final request.
@@ -13,6 +15,67 @@ Split long text into editable, plain-text messages with size limits and a sequen
 Per-card Copy buttons do not move the sequential cursor. Copied badges show clipboard progress, not delivery to an AI service. Restart retains edits and resets progress.
 
 If clipboard access is denied, the selected-text fallback lets you copy manually. Select **Mark this message copied** after doing so; displaying the fallback does not advance progress.
+
+## Live Demo
+
+- **Option 1:** [Open with HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/ChatGPT%20Splitter/index.html)
+- **Option 2:** [Open with GitHack](https://raw.githack.com/KhemnarMayuresh/Tools/main/ChatGPT%20Splitter/index.html)
+- **Source:** [View the tool on GitHub](https://github.com/KhemnarMayuresh/Tools/tree/main/ChatGPT%20Splitter)
+
+These third-party previews use the published main branch and may differ from your local version. Availability could not be verified during this update. Use the local installation below for your latest files.
+
+## Features
+
+- **Smart splitting:** Prefers paragraph, sentence, and word boundaries.
+- **Unicode-safe parts:** Keeps joined emoji, Hindi combining marks, and grapheme clusters intact.
+- **Complete-message budgets:** Counts wrappers and final instructions in each message limit.
+- **Editable output:** Review or edit the initial instructions and individual parts before copying.
+- **Sequential copying:** Copy initial instructions, then one part at a time, with progress badges.
+- **Manual copy fallback:** Copy selected text and confirm when clipboard access is blocked.
+- **Custom instructions:** Use a template with `{totalParts}` and append your final request to the last part.
+- **Profile preferences:** Remember your numeric character budgets for Manual, ChatGPT, Claude, Gemini, and Custom profiles.
+- **Clear edit feedback:** Flags oversized messages and stale output without silently truncating your text.
+- **Local and private:** No server, account, API key, or network tokenizer.
+- **Top-right theme icons:** Light, dark, and system modes with a saved preference.
+- **Responsive and accessible:** Mobile layout, keyboard controls, status messages, and incremental part loading.
+
+## Requirements
+
+### To use the tool
+
+- A modern browser with JavaScript and `Intl.Segmenter` support for safe Unicode boundaries.
+- Text you want to split. No account or API key is required for splitting.
+- Clipboard permission is helpful; manual copying is available when it is denied.
+
+Internet is needed to download the repository, use online previews, or send messages to your chosen external app. The splitter itself processes text offline. Larger inputs may need HTTP serving for worker support.
+
+### Optional developer tools
+
+Node.js runs unit tests and benchmarks. Playwright and Edge run browser smoke checks. They are not needed to split text.
+
+## Installation
+
+### Option 1: Download and open
+
+1. [Download the repository ZIP](https://github.com/KhemnarMayuresh/Tools/archive/refs/heads/main.zip) or clone it:
+
+   ```bash
+   git clone https://github.com/KhemnarMayuresh/Tools.git
+   ```
+
+2. Open the **ChatGPT Splitter** folder.
+3. Keep its HTML, CSS, and JavaScript files together.
+4. Open **index.html** in your browser. No package installation or build step is needed.
+
+### Option 2: Serve locally for larger inputs
+
+If Python is installed, run this from the repository root:
+
+```bash
+python -m http.server 8000
+```
+
+Then open [the local tool](http://localhost:8000/ChatGPT%20Splitter/). A static server enables worker processing where direct-file pages restrict it.
 
 ## Splitting and limits
 
@@ -48,11 +111,24 @@ Generation runs in a cancellable worker with a ten-second deadline. If the brows
 
 Only system/light/dark theme choice and numeric profile budgets are stored locally. Source text, generated messages, edits, clipboard progress, initial instructions, and final task are not stored. Clear All removes source/output and restores default instructions while retaining UI preferences.
 
-## Accessibility
+## Themes and Accessibility
+
+Use the **sun**, **moon**, or **monitor** icon at the top right for light, dark, or system theme. The choice is saved locally, and system mode follows device theme changes.
+
 
 Labeled inputs, visible keyboard focus, polite status messages, keyboard-accessible confirmation and fallback controls, and responsive layouts support desktop and narrow screens. Ordinary textarea editing shortcuts remain available. Escape dismisses the replace-edits confirmation.
 
-## Verification
+## Code Structure
+
+| File | Purpose |
+|---|---|
+| `index.html` / `styles.css` | Input/settings, message cards, theme icons, and responsive layout. |
+| `scripts.js` | Generation workflow, edits, clipboard progress, and UI preferences. |
+| `split-core.js` | Unicode boundaries, complete-message budgets, and message serialization. |
+| `split-worker.js` | Cancellable background generation. |
+| `tests/` / `benchmark.cjs` | Core/browser checks and engine measurements. |
+
+## Developer Verification
 
 ```sh
 node --test "ChatGPT Splitter/tests/*.test.cjs"
@@ -76,3 +152,8 @@ Development benchmarks on Windows with Node 24.21.0: approximately 411 ms for 50
 [MIT](../LICENSE).
 
 Verification performed on Microsoft Edge (Chromium), desktop and 375px width. Firefox was not available in the development environment and remains unverified.
+## Issues & Contributions
+
+- [Open an issue](https://github.com/KhemnarMayuresh/Tools/issues) with reproduction steps, browser/device, and a small non-sensitive example.
+- [Submit a pull request](https://github.com/KhemnarMayuresh/Tools/pulls) for fixes, documentation, or improvements.
+- Run the relevant developer checks above before submitting code changes.

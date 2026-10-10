@@ -100,7 +100,7 @@ const server = http.createServer((req, res) => {
     assert.equal(await page.locator('#splitParts article').count(), 25);
     await page.locator('#loadMore').click();
     assert.equal(await page.locator('#splitParts article').count(), 50);
-    await page.locator('#theme').selectOption('dark');
+    await page.getByRole('button', {name: 'Dark theme', exact: true}).click();
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({path: path.join(root, 'tests/desktop.png'), fullPage: false});

@@ -226,18 +226,21 @@
     if (event.key === 'Escape' && !$('confirmRegenerate').hidden) $('keepEdits').click();
   });
   const themeMedia = matchMedia('(prefers-color-scheme: dark)');
+  let themeValue = 'system';
   function theme() {
-    document.documentElement.dataset.theme = $('theme').value === 'system' ? (themeMedia.matches ? 'dark' : 'light') : $('theme').value;
-    try { localStorage.setItem('splitter-theme', $('theme').value); } catch {}
+    document.documentElement.dataset.theme = themeValue === 'system' ? (themeMedia.matches ? 'dark' : 'light') : themeValue;
+    for (const button of document.querySelectorAll('.theme-switch button')) button.setAttribute('aria-pressed', String(button.dataset.theme === themeValue));
+    try { localStorage.setItem('splitter-theme', themeValue); } catch {}
   }
   try {
     const stored = JSON.parse(localStorage.getItem('splitter-profiles') || '{}');
     for (const key of Object.keys(profiles)) if (Number.isInteger(stored[key]) && stored[key] >= 50 && stored[key] <= 1000000) profiles[key] = stored[key];
     const savedTheme = localStorage.getItem('splitter-theme');
-    if (['system', 'light', 'dark'].includes(savedTheme)) $('theme').value = savedTheme;
+    if (['system', 'light', 'dark'].includes(savedTheme)) themeValue = savedTheme;
   } catch {}
   $('charLimit').value = profiles.manual;
-  $('theme').onchange = theme; themeMedia.addEventListener('change', theme); theme();
+  for (const button of document.querySelectorAll('.theme-switch button')) button.onclick = () => { themeValue = button.dataset.theme; theme(); };
+  themeMedia.addEventListener('change', theme); theme();
   $('template').value = core.DEFAULT_TEMPLATE; $('finalTask').value = core.DEFAULT_TASK;
   sourceCounters();
 })();

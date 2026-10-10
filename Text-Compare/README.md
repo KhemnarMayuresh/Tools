@@ -1,6 +1,30 @@
 # Text Compare
 
-A static, private text and code comparison tool. Paste text or open/drop UTF-8 files into Original and Modified, then select **Compare**. No text is uploaded or automatically saved. Only the theme preference is stored locally.
+Compare two versions of text or code, see exactly what changed, and export a patch. Processing stays in your browser; your text is not uploaded or saved automatically.
+
+**Quick start:** Open `index.html`, paste into **Original** and **Modified**, then click **Compare**. Use the top-right sun, moon, or monitor icon for light, dark, or system theme.
+
+## How to Use
+
+1. **Add the original:** Paste into **Original**, use **Open file**, or drop a UTF-8 file into that panel.
+2. **Add the new version:** Put the updated text or file in **Modified**.
+3. **Compare:** Click **Compare**, or press **Ctrl/Command+Enter**.
+4. **Read the changes:** Added lines show a plus sign; deleted lines show a minus sign. Line numbers and inline highlights help locate edits.
+5. **Choose your view:** Use **Split** to see both versions side by side or **Unified** for one combined list. Mobile starts in unified view.
+6. **Focus the result:** Adjust context lines, expand unchanged ranges, choose a highlighting language, or ignore spaces and tabs.
+7. **Move between changes:** Use the previous/next change controls or **Alt+Up / Alt+Down**. Use **Show more rows** for additional output.
+8. **Export:** Copy the unified patch or download the `.diff` file. When clipboard access is unavailable, copy from the selected fallback text.
+9. **Start again:** **Clear all** empties the inputs and results. **Cancel** stops an in-progress comparison.
+
+For example, comparing `Hello world` with `Hello India` shows the original line removed, the new line added, and the changed words highlighted. No changes produces an empty patch.
+
+## Live Demo
+
+- **Option 1:** [Open with HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Text-Compare/index.html)
+- **Option 2:** [Open with GitHack](https://raw.githack.com/KhemnarMayuresh/Tools/main/Text-Compare/index.html)
+- **Source:** [View the tool on GitHub](https://github.com/KhemnarMayuresh/Tools/tree/main/Text-Compare)
+
+These third-party previews use the published main branch and may differ from your local version. Availability could not be verified during this update. Use the local installation below for your latest files.
 
 ## Features
 
@@ -10,9 +34,47 @@ A static, private text and code comparison tool. Paste text or open/drop UTF-8 f
 - Local lexical highlighting for JavaScript/TypeScript, JSON, HTML, CSS, and Python, with filename/content detection and a Plain Text option.
 - Expandable unchanged ranges; 0, 3, 5, 10 context lines or full file.
 - Previous/next hunk navigation, copy unified patch, download `.diff`.
-- Ignore horizontal spaces/tabs, system/light/dark themes, worker cancellation and input limits.
+- Ignore horizontal spaces/tabs, top-right theme icons, worker cancellation and input limits.
 
-## Running
+## Requirements
+
+### To use the tool
+
+- A modern browser with JavaScript enabled.
+- Plain text or UTF-8 files to compare.
+- No account, API key, framework, or package installation.
+
+Internet is needed to download the repository or use online previews. Local processing works offline. Large comparisons require worker support and may need HTTP serving; clipboard permissions vary by browser.
+
+### Optional developer tools
+
+Node.js runs unit tests and benchmarks. Git is needed for patch-application tests or applying exported patches; Playwright and Edge run the browser smoke checks. None is required for ordinary comparison.
+
+## Installation
+
+### Option 1: Download and open
+
+1. [Download the repository ZIP](https://github.com/KhemnarMayuresh/Tools/archive/refs/heads/main.zip) or clone it:
+
+   ```bash
+   git clone https://github.com/KhemnarMayuresh/Tools.git
+   ```
+
+2. Open the **Text-Compare** folder.
+3. Keep its HTML, CSS, and JavaScript files together.
+4. Open **index.html** in your browser. No package installation or build step is needed.
+
+### Option 2: Serve locally for larger inputs
+
+If Python is installed, run this from the repository root:
+
+```bash
+python -m http.server 8000
+```
+
+Then open [the local tool](http://localhost:8000/Text-Compare/). A static server enables worker processing where direct-file pages restrict it.
+
+## Running and Privacy
 
 Open `index.html` directly for small comparisons, or serve the repository with any static HTTP server and visit `/Text-Compare/`. Keep all sibling scripts and `styles.css` together. There are no network-loaded dependencies or build steps.
 
@@ -33,15 +95,27 @@ Each input is limited to 2 MiB and 50,000 lines. Comparison uses a bounded front
 
 Initial output is limited to 600 visual rows, with **Show more rows** to reveal further output. Distant navigation starts a bounded window around the target hunk; **Show earlier rows** returns to preceding content. Inline computation is skipped above 4,000 combined characters or its own token budget; syntax highlighting is skipped for lines longer than 20,000 characters. The local highlighter is lexical, not a complete parser: multiline constructs and advanced language syntax may have incomplete colors. It is repository-owned code covered by the root MIT license, with no third-party runtime library.
 
-## Keyboard and accessibility
+## Themes, Keyboard, and Accessibility
 
+- **Sun / moon / monitor icons:** light, dark, or system theme. Your choice is saved locally; system mode follows device changes.
 - Ctrl/Command+Enter: compare.
 - Alt+Up / Alt+Down: previous/next change hunk.
 - Tab: move through labeled controls and expandable context buttons.
 
 Ordinary textarea arrow keys remain available. Results use line numbers and +/- indicators in addition to color. Status is announced through a live region. All input content renders as text nodes, including markup and filenames.
 
-## Verification
+## Code Structure
+
+| File | Purpose |
+|---|---|
+| `index.html` / `styles.css` | Controls, layout, theme icons, and responsive results. |
+| `app.js` | User actions, imports, comparison orchestration, and theme preferences. |
+| `diff-core.js` / `diff-worker.js` | Bounded line comparison and background processing. |
+| `diff-renderer.js` / `syntax.js` | Diff rendering, inline edits, and local syntax highlighting. |
+| `patch-export.js` | Exact unified patch generation. |
+| `tests/` / `benchmark.cjs` | Regression checks and engine benchmarks. |
+
+## Developer Verification
 
 Pure-function and actual Git patch-application tests:
 
@@ -77,3 +151,9 @@ Additional browser review checklist:
 ## License
 
 [MIT](../LICENSE).
+
+## Issues & Contributions
+
+- [Open an issue](https://github.com/KhemnarMayuresh/Tools/issues) with reproduction steps, browser/device, and a small non-sensitive example.
+- [Submit a pull request](https://github.com/KhemnarMayuresh/Tools/pulls) for fixes, documentation, or improvements.
+- Run the relevant developer checks above before submitting code changes.

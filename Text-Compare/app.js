@@ -200,12 +200,17 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const media = matchMedia('(prefers-color-scheme: dark)');
+  let themeValue = 'system';
+  try {
+    const saved = localStorage.getItem('text-compare-theme');
+    if (['system', 'light', 'dark'].includes(saved)) themeValue = saved;
+  } catch {}
   function theme() {
-    document.documentElement.dataset.theme = $('theme').value === 'system' ? (media.matches ? 'dark' : 'light') : $('theme').value;
-    try { localStorage.setItem('text-compare-theme', $('theme').value); } catch {}
+    document.documentElement.dataset.theme = themeValue === 'system' ? (media.matches ? 'dark' : 'light') : themeValue;
+    for (const button of document.querySelectorAll('.theme-switch button')) button.setAttribute('aria-pressed', String(button.dataset.theme === themeValue));
+    try { localStorage.setItem('text-compare-theme', themeValue); } catch {}
   }
-  try { $('theme').value = localStorage.getItem('text-compare-theme') || 'system'; } catch {}
-  $('theme').onchange = theme;
+  for (const button of document.querySelectorAll('.theme-switch button')) button.onclick = () => { themeValue = button.dataset.theme; theme(); };
   media.addEventListener('change', theme);
   theme();
   if (matchMedia('(max-width:700px)').matches) $('view').value = 'unified';
