@@ -7,7 +7,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     const page = await browser.newPage({viewport: {width: 1280, height: 1000}});
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    await page.clock.install();
+    await page.clock.install({time: new Date('2026-10-09T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-09T12:00:00Z'));
     await page.goto('file:///' + path.resolve(__dirname, '../30sDrawingGame.html').replace(/\\/g, '/'));
     a.equal(await page.locator('#configuration').evaluate(el => el.open), false);
     a.equal(await page.locator('#finish').isDisabled(), true);

@@ -226,3 +226,18 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
   .confetti-piece { display: none; }
   .chevron { transition: none; }
 }
+.everyday-settings { margin: 16px 0; padding: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+.everyday-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.everyday-heading h3 { margin: 0; font-size: 14px; }
+.everyday-heading .count-badge { display: inline-block; margin-left: 6px; }
+.everyday-heading .field-hint { margin-top: 3px; }
+.everyday-heading button { flex-shrink: 0; }
+#everydayEditor { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
+#everydayWords { line-height: 1.6; }
+.everyday-editor-actions { margin-top: 14px; }
+#everydayRestoreConfirm { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 14px; font-size: 13px; }
+#everydayFeedback:empty { display: none; }
+@media (max-width: 680px) {
+  .everyday-heading { align-items: flex-start; }
+  .everyday-heading .count-badge { display: block; width: fit-content; margin: 5px 0 0; }
+}

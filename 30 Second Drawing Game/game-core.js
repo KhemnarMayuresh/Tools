@@ -104,6 +104,24 @@
     const scores=getScores(s).sort((a,b)=>b.points-a.points);
     return scores.map((player,index)=>({...player,rank:scores.findIndex(p=>p.points===player.points)+1,tied:scores.filter(p=>p.points===player.points).length>1}));
   }
+  function normalizeEverydayWords(words){
+    const errors=[],prompts=[],seen=new Set();
+    if(!Array.isArray(words))return {prompts:[],errors:['Enter one word per line.']};
+    for(const raw of words){
+      if(typeof raw!=='string'){errors.push('Every word must be text.');continue;}
+      const name=raw.trim().normalize('NFC');
+      if(!name)continue;
+      if(length(name)>80)errors.push('Each word must have at most 80 characters.');
+      const normalized=key(name);
+      if(seen.has(normalized))continue;
+      seen.add(normalized);
+      const id='everyday-'+Array.from(normalized,ch=>ch.codePointAt(0).toString(16)).join('-');
+      prompts.push({id,name,categoryId:'category-everyday',categoryName:'Everyday Things',category:'Everyday Things',imageUrl:null});
+    }
+    if(!prompts.length)errors.push('Keep at least one word in Everyday Things.');
+    if(prompts.length>200)errors.push('Everyday Things can have up to 200 unique words.');
+    return {prompts:errors.length?[]:prompts,errors};
+  }
   function normalizeCustomPrompts(category,words,existing){
     const errors=[],name=String(category).trim().normalize('NFC'),custom=existing.filter(x=>x.custom);
     if(!name||length(name)>40)errors.push('Category must have 1–40 characters.');
@@ -130,7 +148,7 @@
     }
   }
   const api={
-    validateDuration,validatePlayers,createGame,getEligiblePrompts,transition,getScores,getRankings,normalizeCustomPrompts
+    validateDuration,validatePlayers,createGame,getEligiblePrompts,transition,getScores,getRankings,normalizeEverydayWords,normalizeCustomPrompts
   }
   ;
   if(typeof module!=='undefined')module.exports=api;

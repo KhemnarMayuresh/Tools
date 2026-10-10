@@ -3,7 +3,20 @@
   const c = DrawingCore;
   const $ = id => document.getElementById(id);
   const audio = createDrawingAudio();
+  const everydayCategoryId = 'category-everyday';
+  const everydayStorageKey = 'drawing-everyday-words';
   let prompts = [...data];
+  let everydayLoadMessage = '';
+  try {
+    const stored = localStorage.getItem(everydayStorageKey);
+    if (stored !== null) {
+      const result = c.normalizeEverydayWords(JSON.parse(stored));
+      if (result.errors.length) throw new Error('Invalid saved word list');
+      prompts = [...result.prompts, ...prompts.filter(p => p.categoryId !== everydayCategoryId)];
+    }
+  } catch {
+    everydayLoadMessage = 'Using the default words. Your saved list could not be loaded.';
+  }
   let roundSequence = 0;
   let pendingReset = null;
   let lastSecond = null;
@@ -89,9 +102,11 @@
   }
 
   function render() {
-    const active = prompts.find(p => p.id === state.active?.promptId);
-    const shown = ['drawing', 'review'].includes(state.phase);
     const record = state.history.at(-1);
+    const currentPrompt = prompts.find(p => p.id === state.active?.promptId);
+    // A saved result keeps the label revealed for that round, even if the word is edited.
+    const active = state.phase === 'review' && record ? {...currentPrompt, id: record.promptId, name: record.promptName, categoryName: record.categoryName} : currentPrompt;
+    const shown = ['drawing', 'review'].includes(state.phase);
     $('roundContent').hidden = finished();
     $('results').hidden = !finished();
     $('scoreboard').hidden = finished();
@@ -117,7 +132,7 @@
     $('roundLabel').textContent = `ROUND ${String(attempt).padStart(2, '0')}`;
     $('players').disabled = state.rosterLocked;
     $('rosterHint').textContent = state.rosterLocked ? 'Players are locked. New Game lets you change the roster.' : '1–12 unique names. Up to 40 characters each.';
-    for (const id of ['duration', 'imageMode', 'search', 'selectAll', 'selectNone', 'customCategory', 'customWords', 'addCustom']) $(id).disabled = busy() || finished();
+    for (const id of ['duration', 'imageMode', 'search', 'selectAll', 'selectNone', 'customCategory', 'customWords', 'addCustom', 'editEveryday', 'everydayWords', 'saveEveryday', 'cancelEveryday', 'restoreEveryday', 'restoreEverydayYes', 'restoreEverydayCancel']) $(id).disabled = busy() || finished();
     $('reset').disabled = finished();
     $('skip').disabled = state.phase !== 'drawing';
     $('start').disabled = busy() || finished() || (state.phase === 'review' && !record?.resolved);
@@ -137,6 +152,7 @@
     renderHistory();
     renderReview(record);
     renderCategories();
+    $('everydayCount').textContent = prompts.filter(p => p.categoryId === everydayCategoryId).length + ' words';
     if (finished()) renderResults();
   }
 
@@ -362,6 +378,14 @@
   $('selectAll').onclick = () => dispatch({type: 'UPDATE_SELECTION', promptIds: prompts.map(p => p.id)});
   $('selectNone').onclick = () => dispatch({type: 'UPDATE_SELECTION', promptIds: []});
   $('addCustom').onclick = () => {
+    if (busy() || finished()) return;
+    if ($('customCategory').value.trim().normalize('NFC').toLowerCase() === 'everyday things') {
+      const result = c.normalizeEverydayWords([...prompts.filter(p => p.categoryId === everydayCategoryId).map(p => p.name), ...$('customWords').value.split('\n')]);
+      if (result.errors.length) return message(result.errors.join(' '));
+      applyEverydayWords(result.prompts);
+      $('customWords').value = '';
+      return;
+    }
     const result = c.normalizeCustomPrompts($('customCategory').value, $('customWords').value.split('\n'), prompts);
     if (result.errors.length) return message(result.errors.join(' '));
     if (!result.prompts.length) return message('No new prompts. Check for duplicates or blank lines.');
@@ -370,7 +394,68 @@
     $('customWords').value = '';
     message(`${result.prompts.length} custom prompts added.`);
   };
-  $('imageMode').onchange = render;
+  function applyEverydayWords(replacement, restore = false) {
+    if (busy() || finished()) return;
+    const previousIds = new Set(prompts.filter(p => p.categoryId === everydayCategoryId).map(p => p.id));
+    const nextIds = new Set(replacement.map(p => p.id));
+    const selection = state.selectedPromptIds.filter(id => !previousIds.has(id) || nextIds.has(id));
+    for (const prompt of replacement) if (!previousIds.has(prompt.id)) selection.push(prompt.id);
+    prompts = [...replacement, ...prompts.filter(p => p.categoryId !== everydayCategoryId)];
+    // Used IDs are retained so removal/re-addition does not recycle a word mid-game.
+    state = c.transition(state, {type: 'UPDATE_SELECTION', promptIds: selection}, prompts);
+    let saved = true;
+    try {
+      if (restore) localStorage.removeItem(everydayStorageKey);
+      else localStorage.setItem(everydayStorageKey, JSON.stringify(replacement.map(p => p.name)));
+    } catch { saved = false; }
+    $('everydayWords').value = replacement.map(p => p.name).join('\n');
+    $('everydayRestoreConfirm').hidden = true;
+    render();
+    const feedback = replacement.length + ' words saved.' + (saved ? ' Your list will be available next time. Existing selections are kept; new words are selected.' : ' Saved for this game only; browser storage is unavailable.');
+    $('everydayFeedback').textContent = feedback;
+    $('setupStatus').textContent = '';
+  }
+  $('editEveryday').onclick = () => {
+    if (busy() || finished()) return;
+    $('everydayWords').value = prompts.filter(p => p.categoryId === everydayCategoryId).map(p => p.name).join('\n');
+    $('everydayEditor').hidden = false;
+    $('everydayRestoreConfirm').hidden = true;
+    $('everydayFeedback').textContent = '';
+    $('everydayWords').focus();
+  };
+  $('saveEveryday').onclick = () => {
+    if (busy() || finished()) return;
+    const result = c.normalizeEverydayWords($('everydayWords').value.split('\n'));
+    if (result.errors.length) {
+      $('everydayFeedback').textContent = result.errors.join(' ');
+      $('everydayWords').focus();
+      return;
+    }
+    applyEverydayWords(result.prompts);
+  };
+  $('cancelEveryday').onclick = () => {
+    if (busy() || finished()) return;
+    $('everydayEditor').hidden = true;
+    $('everydayRestoreConfirm').hidden = true;
+    $('everydayFeedback').textContent = '';
+    $('editEveryday').focus();
+  };
+  $('restoreEveryday').onclick = () => {
+    if (busy() || finished()) return;
+    $('everydayRestoreConfirm').hidden = false;
+    $('restoreEverydayCancel').focus();
+  };
+  $('restoreEverydayCancel').onclick = () => {
+    $('everydayRestoreConfirm').hidden = true;
+    $('restoreEveryday').focus();
+  };
+  $('restoreEverydayYes').onclick = () => {
+    if (busy() || finished()) return;
+    applyEverydayWords(c.normalizeEverydayWords(defaultEverydayWords).prompts, true);
+    $('saveEveryday').focus();
+  };
+  $('everydayFeedback').textContent = everydayLoadMessage;
+    $('imageMode').onchange = render;
   $('duration').oninput = render;
   $('players').oninput = () => {
     if (state.rosterLocked) return;
