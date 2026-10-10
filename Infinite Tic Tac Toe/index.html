@@ -1,401 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Tic Tac Toe</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f4f6fa;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        .controls {
-            margin-bottom: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .controls label,
-        .controls select,
-        .controls input,
-        .controls button {
-            margin: 5px;
-        }
-
-        button:disabled,
-        select:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        button.hidden {
-            display: none;
-        }
-
-        #board {
-            display: grid;
-            gap: 2px;
-            max-width: 90vw;
-            max-height: 60vh;
-            overflow: auto;
-            border: 2px solid #ccc;
-            padding: 10px;
-            background: white;
-        }
-
-        .cell {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #aaa;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .X {
-            color: #e63946;
-        }
-
-        .O {
-            color: #457b9d;
-        }
-
-        .highlight {
-            border: 2px dashed #f4a261;
-            background-color: #ffe8cc;
-        }
-
-        .status {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        /* New CSS for showing and hiding buttons */
-        #pauseBtn,
-        #restartBtn {
-            display: none;
-        }
-
-        .disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-    </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A rolling-mark Tic Tac Toe game. Play with a friend or computer, customize the board, and track your match.">
+<title>Infinite Tic Tac Toe</title><link rel="stylesheet" href="styles.css">
+<script src="game-core.js" defer></script><script src="match-core.js" defer></script><script src="ai.js" defer></script><script src="ai-controller.js" defer></script><script src="audio.js" defer></script><script src="app.js" defer></script>
 </head>
-
-<body>
-    <h1>Infinite Tic Tac Toe</h1>
-    <div class="controls">
-        <label>Grid Size:
-            <select id="gridSize">
-                <option value="3" selected>3 x 3</option>
-                <option value="4">4 x 4</option>
-                <option value="5">5 x 5</option>
-                <option value="6">6 x 6</option>
-                <option value="7">7 x 7</option>
-                <option value="8">8 x 8</option>
-                <option value="9">9 x 9</option>
-                <option value="10">10 x 10</option>
-            </select>
-        </label>
-        <label><input type="checkbox" id="aiToggle" /> Play vs Computer</label>
-        <label id="difficultyLabel" style="display: none;">Difficulty:
-            <select id="difficulty">
-                <option value="0">0 (Easy)</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5" selected>5 (Hard)</option>
-            </select>
-        </label>
-        <button id="startBtn">Start</button>
-        <button id="pauseBtn" class="hidden">Pause</button>
-        <button id="restartBtn" class="hidden">Restart</button>
-    </div>
-    <div id="board"></div>
-    <div class="status" id="status">Click Start to play</div>
-
-    <script>
-        const board = document.getElementById('board');
-        const statusDiv = document.getElementById('status');
-        const aiToggle = document.getElementById('aiToggle');
-        const difficulty = document.getElementById('difficulty');
-        const gridSizeSelect = document.getElementById('gridSize');
-        const startBtn = document.getElementById('startBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const difficultyLabel = document.getElementById('difficultyLabel');
-
-        let SIZE = 10;
-        let currentPlayer = 'X';
-        let boardState = [];
-        let gameOver = false;
-        let gameStarted = false;
-        let paused = false;
-        let playerMoves = { X: [], O: [] };
-
-        function initializeBoardState() {
-            boardState = Array.from({ length: SIZE }, () => Array(SIZE).fill(''));
-            playerMoves = { X: [], O: [] };
-        }
-
-        function createBoard() {
-            board.innerHTML = '';
-            board.style.gridTemplateColumns = `repeat(${SIZE}, 50px)`;
-            for (let row = 0; row < SIZE; row++) {
-                for (let col = 0; col < SIZE; col++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    cell.dataset.row = row;
-                    cell.dataset.col = col;
-                    board.appendChild(cell);
-                }
-            }
-            board.querySelectorAll('.cell').forEach(cell => cell.addEventListener('click', handleCellClick));
-        }
-
-        function handleCellClick(e) {
-            //A move is only made if the game is started, not over, and not paused.
-            if (!gameStarted || gameOver || paused) return;
-
-            const row = +e.target.dataset.row;
-            const col = +e.target.dataset.col;
-            console.log(`row ${row} col ${col} for player ${currentPlayer}`);
-            if (boardState[row][col] !== '') return;
-
-            //If a player has already placed three moves, the oldest move is removed.
-            const moves = playerMoves[currentPlayer];
-            if (moves.length === SIZE) {
-                const { row: oldRow, col: oldCol } = moves.shift();
-                boardState[oldRow][oldCol] = '';
-                const oldCell = document.querySelector(`[data-row='${oldRow}'][data-col='${oldCol}']`);
-                oldCell.textContent = '';
-                oldCell.classList.remove(currentPlayer);
-                oldCell.classList.remove('highlight');
-            }
-
-            boardState[row][col] = currentPlayer;
-            e.target.textContent = currentPlayer;
-            e.target.classList.add(currentPlayer);
-            playerMoves[currentPlayer].push({ row, col });
-
-            // Highlight the oldest move to indicate it's next to be removed
-            const allCells = document.querySelectorAll('.cell');
-            allCells.forEach(c => c.classList.remove('highlight'));
-            const other = currentPlayer === 'X' ? 'O' : 'X';
-            if (playerMoves[other].length === 3) {
-                const nextToRemove = playerMoves[other][0];
-                const highlightCell = document.querySelector(`[data-row='${nextToRemove.row}'][data-col='${nextToRemove.col}']`);
-                highlightCell.classList.add('highlight');
-            }
-
-            //It checks if the player has won after every move.
-            if (checkWinner(row, col, currentPlayer)) {
-                alert(`${currentPlayer} wins!`);
-                statusDiv.textContent = `${currentPlayer} wins!`;
-                gameOver = true;
-                pauseBtn.style.display = 'none';
-                return;
-            }
-
-            // tie logic
-            if (playerMoves.X.length + playerMoves.O.length >= 15) {
-                statusDiv.textContent = 'It\'s a tie!';
-                gameOver = true;
-                return;
-            }
-
-            // Switches turns between players (X and O).
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            statusDiv.textContent = `${currentPlayer}'s turn`;
-
-            // If playing against the computer (AI), the AI makes its move after the player's turn.
-            if (aiToggle.checked && currentPlayer === 'O') {
-                setTimeout(aiMove, 300);
-            }
-        }
-
-        function checkWinner(r, c, player) {
-            return (
-                checkDirection(r, c, 1, 0, player) ||
-                checkDirection(r, c, 0, 1, player) ||
-                checkDirection(r, c, 1, 1, player) ||
-                checkDirection(r, c, 1, -1, player)
-            );
-        }
-
-        function checkDirection(r, c, dr, dc, player) {
-            let count = 1;// Start with the current move already counted
-
-            // Check one direction (forward)
-            for (let i = 1; i < SIZE; i++) {
-                const newRow = r + dr * i;
-                const newCol = c + dc * i;
-                if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && boardState[newRow][newCol] === player) {
-                    count++;
-                } else {
-                    break;
-                }
-            }
-
-            // Check the opposite direction (backward)
-            for (let i = 1; i < SIZE; i++) {
-                const newRow = r - dr * i;
-                const newCol = c - dc * i;
-                if (newRow >= 0 && newRow < SIZE && newCol >= 0 && newCol < SIZE && boardState[newRow][newCol] === player) {
-                    count++;
-                } else {
-                    break;
-                }
-            }
-
-            // If count is size or more, return true
-            return count >= SIZE;
-        }
-
-        function aiMove() {
-            if (!gameStarted || paused || gameOver) return;
-            let level = +difficulty.value;
-            let move = findBestMove(level);
-            if (!move) return;
-            const { row, col } = move;
-            const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
-            handleCellClick({ target: cell });
-        }
-
-        function findBestMove(level) {
-            let emptyCells = [];
-            boardState.forEach((row, r) => row.forEach((val, c) => {
-                if (!val) emptyCells.push({ row: r, col: c });
-            }));
-
-            // Level 0–1: Random move
-            if (level <= 1) {
-                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            }
-
-            // Helper to simulate a move
-            const simulateMove = (r, c, player) => {
-                boardState[r][c] = player;
-                const win = checkWinner(r, c, player);
-                boardState[r][c] = ''; // Reset
-                return win;
-            };
-
-            // Level 2–3: Block opponent's win
-            if (level <= 3) {
-                for (let { row, col } of emptyCells) {
-                    if (simulateMove(row, col, 'X')) return { row, col }; // block player
-                }
-                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            }
-
-            // Level 4: Try to win, else block
-            if (level === 4) {
-                for (let { row, col } of emptyCells) {
-                    if (simulateMove(row, col, 'O')) return { row, col }; // win
-                }
-                for (let { row, col } of emptyCells) {
-                    if (simulateMove(row, col, 'X')) return { row, col }; // block
-                }
-                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            }
-
-            // Level 5: Greedy + Win + Block + Center/Edge preference
-            if (level === 5) {
-                for (let { row, col } of emptyCells) {
-                    if (simulateMove(row, col, 'O')) return { row, col }; // win
-                }
-                for (let { row, col } of emptyCells) {
-                    if (simulateMove(row, col, 'X')) return { row, col }; // block
-                }
-
-                // Prefer center
-                const center = Math.floor(SIZE / 2);
-                const centerCell = emptyCells.find(({ row, col }) => row === center && col === center);
-                if (centerCell) return centerCell;
-
-                // Prefer cells near existing 'O'
-                for (let { row, col } of emptyCells) {
-                    const nearO = [-1, 0, 1].some(dr =>
-                        [-1, 0, 1].some(dc => {
-                            const r = row + dr, c = col + dc;
-                            return r >= 0 && c >= 0 && r < SIZE && c < SIZE && boardState[r][c] === 'O';
-                        })
-                    );
-                    if (nearO) return { row, col };
-                }
-
-                // fallback
-                return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            }
-
-            return null;
-        }
-
-
-        aiToggle.addEventListener('change', () => {
-            difficultyLabel.style.display = aiToggle.checked ? 'inline-block' : 'none';
-        });
-
-        startBtn.addEventListener('click', () => {
-            SIZE = parseInt(gridSizeSelect.value);
-            initializeBoardState();
-            createBoard();
-            currentPlayer = 'X';
-            gameOver = false;
-            gameStarted = true;
-            paused = false;
-            statusDiv.textContent = `${currentPlayer}'s turn`;
-            pauseBtn.style.display = 'inline-block';
-            restartBtn.style.display = 'inline-block';
-            gridSizeSelect.disabled = true;
-            startBtn.style.display = 'none';
-            difficulty.disabled = true;
-        });
-
-        pauseBtn.addEventListener('click', () => {
-            if (!gameStarted) return;
-            paused = !paused;
-            pauseBtn.textContent = paused ? 'Resume' : 'Pause';
-            statusDiv.textContent = paused ? 'Game Paused' : `${currentPlayer}'s turn`;
-        });
-
-        restartBtn.addEventListener('click', () => {
-            if (!gameStarted) return;
-            initializeBoardState();
-            createBoard();
-            currentPlayer = 'X';
-            gameOver = false;
-            paused = false;
-            statusDiv.textContent = `${currentPlayer}'s turn`;
-            pauseBtn.textContent = 'Pause';
-            gridSizeSelect.disabled = false;
-            difficulty.disabled = false;
-            startBtn.style.display = 'inline-block';
-            pauseBtn.style.display = 'none';
-            restartBtn.style.display = 'none';
-        });
-
-    </script>
-</body>
-
-</html>
+<body><main class="page">
+<header class="header">
+<div class="theme-controls" role="group" aria-label="Color theme">
+<button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
+<button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></svg></button>
+<button type="button" data-theme-choice="system" aria-label="System theme" title="Follow system theme" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></button>
+</div>
+<p class="eyebrow">A familiar game. A fresh challenge.</p><h1>Infinite Tic Tac Toe</h1><p class="muted">Connect your marks before they disappear. Play with a friend or challenge the computer.</p>
+</header>
+<details class="panel" id="configuration">
+<summary>Game settings <span id="settingsSummary">Two players · 3 × 3 · connect 3</span></summary>
+<div class="settings-content"><fieldset id="matchSettings"><legend class="sr-only">Match settings</legend><div class="settings-grid">
+<label>Grid size<select id="size"><option value="3">3 × 3</option><option value="4">4 × 4</option><option value="5">5 × 5</option><option value="6">6 × 6</option><option value="7">7 × 7</option><option value="8">8 × 8</option><option value="9">9 × 9</option><option value="10">10 × 10</option></select></label>
+<label>Marks to connect<select id="winLength"><option value="3">3 in a row</option></select></label>
+<label>Opponent<select id="mode"><option value="local">Two players</option><option value="computer">Computer (O)</option></select></label>
+<label id="difficultyLabel" hidden>Computer level<select id="difficulty"><option value="0">0 · Random</option><option value="1">1 · Finds wins</option><option value="2">2 · Wins & blocks</option><option value="3" selected>3 · Positional</option><option value="4">4 · Short search</option><option value="5">5 · Deeper search</option></select></label>
+<label>Player X name<input id="nameX" value="Player X" autocomplete="off" spellcheck="false" aria-describedby="namesHelp"></label>
+<label>Player O name<input id="nameO" value="Player O" autocomplete="off" spellcheck="false" aria-describedby="namesHelp"></label>
+<label>Move limit<input id="moveLimit" type="number" min="20" max="1000" step="1" value="200" aria-describedby="limitHelp"></label>
+</div></fieldset>
+<p class="hint" id="namesHelp">Names: 1–40 characters, different for each player. Computer always plays O.</p><p class="hint" id="limitHelp">Draw after this many legal moves, or when the same complete position occurs three times.</p><p class="hint">Settings lock when a match starts. Choose New match to change them.</p>
+<div class="preferences"><label class="sound-label"><input type="checkbox" id="sound" checked> Sound</label><label class="volume-label">Volume<input type="range" id="volume" min="0" max="1" step="0.05" value="0.2" aria-label="Sound volume"></label><span class="hint">Local tones only</span></div>
+</div></details>
+<section class="panel game" aria-label="Game board and controls">
+<div class="game-top"><div><p class="round-label" id="roundLabel">Ready to play</p><p id="turn" role="status" aria-live="polite">Start a new match</p><p id="rules">3 × 3 board · connect 3 · keep 3 marks each</p></div><div class="move-badge">Moves<span id="moveCount">0 / 200</span></div></div>
+<p class="rule-tip" id="rollingHelp">Each player keeps 3 marks. Once you reach the limit, your oldest mark leaves before your next mark is placed. Choose an empty square.</p>
+<div class="board-viewport" role="region" aria-label="Scrollable game board" tabindex="0" aria-describedby="keyboardHelp"><div class="board" id="board" role="grid" aria-label="Tic Tac Toe board" aria-disabled="true"></div></div>
+<p class="hint" id="keyboardHelp">Use arrow keys to explore; Enter or Space places a mark. Dashed marks labelled “next” will leave on that player's next move. Large boards scroll here.</p>
+<div class="players" id="players" aria-label="Active marks and move order"></div>
+<div class="actions" aria-label="Game actions"><button class="primary" id="start" type="button">Start match</button><button class="primary" id="nextRound" type="button" hidden>Next round</button><button id="pause" type="button" hidden>Pause</button><button id="undo" type="button" hidden>Undo</button><button id="restart" type="button" hidden>Restart round</button><button id="newMatch" type="button" hidden>New match</button></div>
+<p class="status" id="status" role="status" aria-live="polite">Start with the defaults, or open Game settings to customize.</p><p class="hint" id="aiStatus" role="status" aria-live="polite" hidden></p>
+<div class="confirmation" id="confirmation" role="group" aria-label="Confirm game action" hidden><p id="confirmText"></p><div class="actions"><button type="button" id="confirmYes" class="primary">Confirm</button><button type="button" id="confirmNo">Keep playing</button></div></div>
+</section>
+<section class="panel" aria-labelledby="scoresHeading"><h2 id="scoresHeading">Match scoreboard</h2><div class="score-grid"><div class="score"><div class="score-name" id="xScoreName">Player X · X</div><span id="xScore" class="score-number">0</span><span class="hint">wins</span></div><div class="score"><div class="score-name" id="oScoreName">Player O · O</div><span id="oScore" class="score-number">0</span><span class="hint">wins</span></div><div class="score"><div class="score-name">Draws</div><span id="drawScore" class="score-number">0</span><span class="hint">rounds</span></div></div><p class="hint">Scores belong to this match. Refreshing the page clears game progress.</p></section>
+<section class="panel" aria-labelledby="historyHeading"><h2 id="historyHeading">Round history</h2><p class="muted" id="historyEmpty">Completed rounds appear here. Restarted rounds don't count.</p><ol class="history" id="history"></ol></section>
+<p class="footer">Made for a quick challenge. No account needed. <a href="README.md">Rules & guide</a></p><noscript>This game requires JavaScript. Enable it in your browser, then reload.</noscript>
+</main></body></html>
