@@ -1,428 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30 Second Drawing Game</title>
-    <!-- Version 0.0.1 -->
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>30 Second Drawing Game</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    <div class="container">
-        <h1>30 Second Drawing Game</h1>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20 15.5A9 9 0 0 1 8.5 4a9 9 0 1 0 11.5 11.5Z"/></symbol>
+    <symbol id="icon-system" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6m8 4v6"/></symbol>
+    <symbol id="icon-pencil" viewBox="0 0 24 24"><path d="m16 3 5 5-12 12-6 1 1-6L16 3Zm-2 2 5 5M4 15l5 5"/></symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Zm10 2h4v3a4 4 0 0 1-4 4M7 5H3v3a4 4 0 0 0 4 4m5 2v6m-5 1h10"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </svg>
+  <main>
+    <header class="page-header">
+      <a class="brand" href="30sDrawingGame.html" aria-label="30 Second Drawing Game home"><span class="brand-mark"><svg class="icon"><use href="#icon-pencil"/></svg></span><span>DRAW<span class="brand-dot">.</span></span></a>
+      <div class="theme-switch" role="group" aria-label="Color theme">
+        <button type="button" data-theme="light" aria-label="Light theme" title="Light theme"><svg class="icon" aria-hidden="true"><use href="#icon-sun"/></svg></button>
+        <button type="button" data-theme="dark" aria-label="Dark theme" title="Dark theme"><svg class="icon" aria-hidden="true"><use href="#icon-moon"/></svg></button>
+        <button type="button" data-theme="system" aria-label="System theme" title="System theme"><svg class="icon" aria-hidden="true"><use href="#icon-system"/></svg></button>
+      </div>
+    </header>
+    <div class="intro"><p class="eyebrow">A LITTLE TIME. A LOT OF CREATIVITY.</p><h1>30 Second Drawing Game</h1><p>Grab some paper. Draw together. Pick your winner.</p></div>
 
-        <!-- Instructions Section -->
-        <div class="cards" id="instructions">
-            <h2>
-                How to Play
-                <button id="toggleInstructions" class="toggle-btn">Show</button>
-            </h2>
-            <div id="instructionsContent" style="display: none;">
-                <ol>
-                    <li>A word or name will be shown to draw. (Example: Icecream, Iron Man)</li>
-                    <li>A timer for the selected time range (default: 30 seconds) starts on the "Go" button click.</li>
-                    <li>All players must draw the shown word within the time limit. Stop drawing when the timer ends.
-                    </li>
-                    <li>After the time is up, compare drawings and vote on the best one. The winner gets one point.</li>
-                    <li>The first player to get the most points wins!</li>
-                </ol>
-                <b style="margin-left: 20px;"><i>Notes:</i></b>
-                <ul>
-                    <li>Each one will only repeat once to draw. You can click on Restart button to start game again with
-                        same selection.</li>
-                </ul>
-            </div>
+    <details id="configuration" class="configuration" data-region="configuration">
+      <summary><span class="summary-title"><svg class="icon" aria-hidden="true"><use href="#icon-settings"/></svg>Game settings</span><span id="setupSummary">2 players · 30 seconds · 196 prompts</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+      <div class="configuration-body"><p id="setupStatus" class="setup-feedback" role="status" aria-live="polite"></p>
+        <div class="setup-grid">
+          <div><h2>Your players</h2><label for="players">One name per line</label><textarea id="players" rows="3">Player 1
+Player 2</textarea><p id="rosterHint" class="field-hint">1–12 players; names up to 40 characters.</p></div>
+          <div><h2>Round preferences</h2><div class="settings-grid"><label>Drawing time <span class="input-with-unit"><input id="duration" type="number" min="10" max="120" step="1" value="30"><span>seconds</span></span></label><label>Reference image <select id="imageMode"><option value="after">Show after the round</option><option value="during">Show while drawing</option></select></label><label class="check-label"><input id="sound" type="checkbox" checked> Play sound cues</label><label>Sound volume <input id="volume" type="range" min="0" max="1" step="0.05" value="0.25"></label></div></div>
         </div>
-
-        <!-- Category Selection -->
-        <div class="cards" id="settings">
-            <h2>
-                Settings
-                <button id="toggleCategorySection" class="toggle-btn">Hide</button>
-            </h2>
-            <label for="timeTime">Time Range (seconds):</label>
-            <input type="number" id="timeTime" class="text-field" value="30" max="120" min="10">
-            <b style="color: red; margin:0 10px 0 10px">
-                <input type="checkbox" id="showReferenceImage"><label for="showReferenceImage">Show Reference Image all
-                    Time</label>
-                <input type="checkbox" id="sendAlertMag" checked><label for="sendAlertMag">Show Alert Messages</label>
-            </b>
-            <button id="RestartBtn">Restart</button>
-            <div id="settingsContent">
-                <!-- Add a Select All checkbox -->
-                <label>
-                    <input type="checkbox" id="selectAllCategories"> Select All Categories
-                </label>
-                <div class="searchContainer">
-                    <input type="text" id="searchBox" class="text-field"
-                        placeholder="Search for categories or names...">
-                </div>
-                <div class="categories">
-                    <!-- Dynamically populate this section with JS -->
-                </div>
-            </div>
+        <div class="prompt-settings"><div class="section-heading"><div><h2>Choose your prompts</h2><p id="totals" class="field-hint"></p></div><div class="actions"><button id="selectAll" class="small-button">Select all</button><button id="selectNone" class="small-button">Clear selection</button></div></div><label for="search" class="sr-only">Search categories or words</label><input id="search" type="search" placeholder="Search categories or words…"><div class="everyday-settings">
+            <div class="everyday-heading"><div><h3>Everyday Things <span id="everydayCount" class="count-badge">150 words</span></h3><p class="field-hint">Easy, familiar prompts: cups, tiffin boxes, cars, samosas and more.</p></div><button id="editEveryday" class="small-button">Edit words</button></div>
+            <div id="everydayEditor" hidden><label for="everydayWords">Words, one per line</label><textarea id="everydayWords" rows="8" spellcheck="false" aria-describedby="everydayEditorHint"></textarea><p id="everydayEditorHint" class="field-hint">Add, rename or remove words. Keep 1–200 unique words, up to 80 characters each. Duplicate and blank lines are ignored. Changes save only in this browser.</p><div class="actions everyday-editor-actions"><button id="saveEveryday" class="primary-button">Save words</button><button id="cancelEveryday">Cancel</button><button id="restoreEveryday" class="quiet-button">Restore default words</button></div><div id="everydayRestoreConfirm" hidden><p>Replace your list and unsaved edits with the original 150 words?</p><div class="actions"><button id="restoreEverydayYes">Restore 150 words</button><button id="restoreEverydayCancel">Keep my words</button></div></div></div>
+            <p id="everydayFeedback" class="field-hint" role="status" aria-live="polite"></p>
+          </div><div id="categories"></div>
+          <details class="custom-settings"><summary>Add custom prompts</summary><label>Category <input id="customCategory" maxlength="80" placeholder="e.g. Everyday things"></label><label>Words, one per line <textarea id="customWords" rows="4" placeholder="Coffee cup&#10;Bicycle&#10;A sleepy cat"></textarea></label><p class="field-hint">Up to 10 custom categories and 200 words. Category: 40 characters; word: 80.</p><button id="addCustom">Add prompts</button></details>
         </div>
+        <div class="reset-settings"><p class="field-hint">Reset the pool to reuse words. New Game also clears scores and history.</p><div class="actions"><button id="reset">Reset word pool</button><button id="newGame">New Game</button></div></div>
+      </div>
+    </details>
 
-        <!-- Time Selection and Start Button -->
-        <div class="cards">
-            <div class="button-container">
-                <button id="startButton">Go</button>
-            </div>
+    <section class="play" data-region="play" aria-label="Current round">
+      <div id="roundContent">
+        <div class="play-heading"><span id="roundLabel" class="eyebrow">ROUND 01</span><span id="stage" class="phase-badge" role="status" aria-live="polite">Ready to play</span></div>
+        <div class="play-grid">
+          <div class="drawing-panel"><p id="promptPlaceholder">Your next masterpiece awaits.</p><h2 id="prompt"></h2><div id="reference"></div><div id="referenceEmpty"><div class="sketch-icon" aria-hidden="true"><svg viewBox="0 0 160 130"><path d="M32 100h96M38 88l10-36 44-31 22 26-44 31-32 10Z"/><path d="m83 28 22 26M48 52l22 26m-32 10 17-5-12-14M26 36l-6-7m105-6 7-7m0 55 10 2"/><circle cx="26" cy="66" r="3"/></svg></div><p id="referenceHint">The prompt appears when you start.</p></div></div>
+          <div class="timer-panel"><p class="eyebrow">MAKE EVERY SECOND COUNT</p><div id="timer" role="timer">30</div><p id="timerCaption">seconds per round</p><p id="urgency" aria-live="off"></p><div class="play-actions"><button id="start" class="primary-button">Start round <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button><button id="skip" class="quiet-button" disabled>Skip prompt</button></div><p id="playHint">Everyone draws the same prompt.</p></div>
         </div>
+        <div id="review" hidden></div>
+        <p id="status" role="status" aria-live="polite"></p>
+        <div class="how-to-play"><span><b>1</b> Get paper & pencils</span><span><b>2</b> Draw when you see Go</span><span><b>3</b> Choose a winner</span></div>
+      </div>
+      <div id="results" hidden tabindex="-1" aria-labelledby="resultsTitle">
+        <div id="confetti" aria-hidden="true"></div><div class="results-heading"><span class="trophy-icon" aria-hidden="true"><svg class="icon"><use href="#icon-trophy"/></svg></span><p class="eyebrow">THAT'S A WRAP</p><h2 id="resultsTitle">The results are in!</h2><p id="resultsSummary"></p></div>
+        <div id="podium" class="podium"></div><p id="tieNote" class="field-hint"></p>
+        <div id="remainingRanks" class="remaining-ranks"></div>
+        <button id="playAgain" class="primary-button">Play again <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg></button><p class="field-hint">Start fresh with the same players and settings.</p>
+      </div>
+    </section>
 
-        <!-- Word and Timer Display -->
-        <div class="cards" style="text-align: center; min-height: 50vh;">
-            <div id="word" class="hidden"></div>
-            <div id="readySetGo"></div>
-            <!-- Circular Countdown Progress Bar -->
-            <div class="countdown-container circular hidden" id="countdownTimer">
-                <svg class="progress-circle" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" />
-                    <circle class="progress" cx="50" cy="50" r="45" />
-                </svg>
-                <div class="circular-timer" id="circular-timer">
-                    <div id="timer" class="hidden"></div>
-                </div>
-            </div>
-            <!-- Image Display after timer -->
-            <div id="imageDisplay" class="hidden"></div>
-        </div>
-
-    </div>
-    <script src="Data.js"></script>
-    <script>
-        // Organize categories
-        const categories = data.reduce((acc, { name, category, imageUrl }) => {
-            if (!acc[category]) acc[category] = [];
-            acc[category].push({ name, imageUrl });
-            return acc;
-        }, {});
-
-        // Create category checkboxes
-        // Function to create category checkboxes and select all logic
-        function createCategoryCheckbox(category, names) {
-            const container = document.createElement('div');
-            container.className = 'category';
-
-            const header = document.createElement('div');
-            header.className = 'category-header';
-
-            const categoryCheckbox = document.createElement('input');
-            categoryCheckbox.type = 'checkbox';
-            categoryCheckbox.id = category;
-            let isDefaultChecked = defaultSelectedCategories.includes(category);
-            if (isDefaultChecked) {
-                categoryCheckbox.checked = true;
-            }
-
-            const label = document.createElement('label');
-            label.htmlFor = category;
-            label.textContent = category;
-
-            // Listen for category checkbox change
-            categoryCheckbox.addEventListener('change', (event) => {
-                // Select or unselect all name checkboxes based on category checkbox state
-                const nameCheckboxes = container.querySelectorAll('.name-item input');
-                nameCheckboxes.forEach(checkbox => {
-                    checkbox.checked = event.target.checked;
-                });
-            });
-
-            header.appendChild(categoryCheckbox);
-            header.appendChild(label);
-            container.appendChild(header);
-
-            // Names list
-            const namesContainer = document.createElement('div');
-            namesContainer.className = 'names';
-
-            names.forEach(item => {
-                const nameContainer = document.createElement('div');
-                nameContainer.className = 'name-item';
-
-                const nameCheckbox = document.createElement('input');
-                nameCheckbox.type = 'checkbox';
-                nameCheckbox.id = item.name;
-                if (isDefaultChecked) {
-                    nameCheckbox.checked = true;
-                }
-
-
-                const nameLabel = document.createElement('label');
-                nameLabel.htmlFor = item.name;
-                nameLabel.textContent = item.name;
-
-                // Image
-                const nameimgContainer = document.createElement('div');
-                nameimgContainer.className = 'img-container';
-                const imageElement = document.createElement('img');
-                imageElement.src = item.imageUrl;
-                imageElement.alt = item.name;
-                nameimgContainer.appendChild(imageElement);
-                nameContainer.appendChild(nameimgContainer);
-
-                // Add event listener to check if the name is selected
-                nameCheckbox.addEventListener('change', () => {
-                    // Check if any name checkbox is selected in the category
-                    const categoryCheckbox = document.getElementById(category);
-                    const nameCheckboxes = container.querySelectorAll('.name-item input');
-
-                    // If any name is checked, check the category checkbox
-                    categoryCheckbox.checked = Array.from(nameCheckboxes).some(checkbox => checkbox.checked);
-                });
-
-                nameContainer.appendChild(nameCheckbox);
-                nameContainer.appendChild(nameLabel);
-                namesContainer.appendChild(nameContainer);
-            });
-
-            container.appendChild(namesContainer);
-            return container;
-        }
-
-        window.onload = () => {
-            const root = document.querySelector('.categories');
-            Object.keys(categories).forEach(category => {
-                const names = categories[category];
-                const categoryCheckbox = createCategoryCheckbox(category, names);
-                root.appendChild(categoryCheckbox);
-            });
-        };
-
-        // Select all checkbox functionality
-        const selectAllCategories = document.getElementById('selectAllCategories');
-
-        // Function to check/uncheck all category checkboxes
-        selectAllCategories.addEventListener('change', () => {
-            const container = document.querySelector('.categories');
-            const isChecked = selectAllCategories.checked;
-            const categoryCheckboxes = container.querySelectorAll('.category-header input[type="checkbox"]');
-            categoryCheckboxes.forEach(checkbox => {
-                checkbox.checked = isChecked;// Select or unselect all name checkboxes based on category checkbox state
-                const nameCheckboxes = container.querySelectorAll('.name-item input');
-                nameCheckboxes.forEach(checkboxNames => {
-                    checkboxNames.checked = isChecked;
-                });
-            });
-        });
-
-
-        // Timer and word management
-        const timeTimeInput = document.getElementById('timeTime');
-        const startButton = document.getElementById('startButton');
-        const timerElement = document.getElementById("timer");
-        const readySetGo = document.getElementById("readySetGo");
-        const wordElement = document.getElementById("word");
-        const imageDisplay = document.getElementById("imageDisplay");
-        const RestartBtn = document.getElementById('RestartBtn');
-        const sendAlertMag = document.getElementById('sendAlertMag');
-        const showReferenceImage = document.getElementById('showReferenceImage');
-        // Circular Countdown Timer
-        const countdownTimer = document.getElementById('countdownTimer');
-        const circularBar = document.querySelector('.progress-circle .progress');
-        // Set initial progress bar to 100%
-        const circumference = 2 * Math.PI * 45; // Circle radius is 45
-        circularBar.style.strokeDashoffset = 0; // Set full stroke initially
-        let displayedNames = [];  // Track displayed names
-
-        RestartBtn.addEventListener("click", () => {
-            displayedNames = [];
-            resetGame(); // Reset game state
-        });
-
-        // Start button event listener
-        startButton.addEventListener("click", () => {
-
-            resetGame(); // Reset game state
-
-            // Step 1: Get all checked categories
-            const selectedCategories = [];
-            const categoryCheckboxes = document.querySelectorAll('.category-header input[type="checkbox"]');
-            categoryCheckboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedCategories.push(checkbox.id); // Save the category name
-                }
-            });
-
-            // Step 2: Get checked names under the selected categories
-            const selectedNames = [];
-            selectedCategories.forEach(category => {
-                const categoryContainer = document.querySelector(`#${category}`).closest('.category');
-                const nameCheckboxes = categoryContainer.querySelectorAll('.name-item input[type="checkbox"]');
-
-                nameCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        const name = checkbox.id;
-                        const imageUrl = data.find(item => item.name === name).imageUrl; // Get the image URL
-                        selectedNames.push({ name, imageUrl }); // Save name and image URL
-                    }
-                });
-            });
-
-            // Step 3: Randomly select a name from the selected names
-            if (selectedNames.length > 0) {
-                // Filter out already displayed names
-                const availableNames = selectedNames.filter(item => !displayedNames.includes(item.name));
-
-                if (availableNames.length > 0) {
-                    // Select a random name from the available names
-                    const randomNameData = availableNames[Math.floor(Math.random() * availableNames.length)];
-                    const randomName = randomNameData.name;
-                    const randomImageUrl = randomNameData.imageUrl;
-
-                    // Add this name to the displayed list to avoid repeating
-                    displayedNames.push(randomName);
-
-                    // Display the random name
-                    wordElement.textContent = randomName;
-                    wordElement.classList.remove("hidden");
-                    timerElement.classList.remove("hidden");
-                    if (showReferenceImage.checked) {
-                        displayImage(randomImageUrl, randomName);
-                    }
-
-                    // Disable the Go button and start the timer with countdown sequence
-                    startButton.disabled = true;
-
-                    // Show "Ready", "Set", "Go" countdown first
-                    countdownSequence(randomImageUrl, randomName);
-                } else {
-                    alert("All available names have been drawn. Please select new ones or reset from settings to start agin.");
-                }
-            } else {
-                alert("Please select at least one name from the categories.");
-            }
-        });
-
-        // Reset displayed names when categories change
-        document.querySelectorAll('.category-header input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                displayedNames = [];  // Clear displayed names when categories are updated
-            });
-        });
-
-        // Add search functionality
-        document.getElementById('searchBox').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const categories = document.querySelectorAll('.category');
-            categories.forEach(category => {
-                const categoryName = category.querySelector('.category-header label').textContent.toLowerCase();
-                const names = category.querySelectorAll('.name-item');
-                let hasVisibleName = false;
-
-                names.forEach(name => {
-                    const nameText = name.querySelector('label').textContent.toLowerCase();
-                    const isVisible = nameText.includes(searchTerm) || categoryName.includes(searchTerm);
-                    name.style.display = isVisible ? 'flex' : 'none';
-                    if (isVisible) hasVisibleName = true;
-                });
-
-                // Toggle category visibility based on search result
-                category.style.display = hasVisibleName ? 'block' : 'none';
-            });
-        });
-
-        // Function to toggle visibility and button text
-        function toggleVisibility(buttonId, sectionId) {
-            const section = document.getElementById(sectionId);
-            const button = document.getElementById(buttonId);
-
-            if (section.style.display === "none") {
-                section.style.display = "block";
-                button.textContent = "Hide";
-            } else {
-                section.style.display = "none";
-                button.textContent = "Show";
-            }
-        }
-
-        // Toggle category section visibility
-        document.getElementById("toggleCategorySection").addEventListener("click", () => {
-            toggleVisibility("toggleCategorySection", "settingsContent");
-        });
-
-        // Toggle instructions visibility
-        document.getElementById("toggleInstructions").addEventListener("click", () => {
-            toggleVisibility("toggleInstructions", "instructionsContent");
-        });
-
-        // Countdown sequence (Ready, Set, Go)
-        function countdownSequence(imageUrl, name) {
-            const countdownMessages = ["Ready", "Set", "Go"];
-            let count = 0;
-
-            const countdownInterval = setInterval(() => {
-                if (count < countdownMessages.length) {
-                    readySetGo.textContent = countdownMessages[count];
-                    count++;
-                } else {
-                    clearInterval(countdownInterval);
-                    // Disable the Go button and start the timer
-                    readySetGo.textContent = "";
-                    const timeRange = parseInt(timeTimeInput.value);
-                    countdownTimer.classList.remove("hidden");
-                    startTimer(timeRange, imageUrl, name);  // Start the timer
-                }
-            }, 1000);
-        }
-
-        // Timer function with image display
-        function startTimer(duration, imageUrl, name) {
-            let timeLeft = duration;
-            timerElement.textContent = timeLeft + "sec";
-            const timerInterval = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = timeLeft + "sec";
-                // Update circular bar
-                if (circularBar) {
-                    const circumference = 2 * Math.PI * 45; // Circle radius is 45
-                    const offset = circumference - (timeLeft / duration) * circumference;
-                    circularBar.style.strokeDashoffset = offset;
-                }
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    // Update circular bar
-                    if (circularBar) {
-                        circularBar.style.strokeDashoffset = 1;
-                    }
-                    if (sendAlertMag.checked) {
-                        alert("Time's up! Compare your drawings and vote for the best one.");
-                    }
-                    timerElement.classList.add("hidden");
-                    // Display the image after the timer ends
-                    if (!showReferenceImage.checked) {
-                        displayImage(imageUrl, name);
-                    }
-                    // Disable the Go button and start the timer with countdown sequence
-                    startButton.disabled = false;
-                    countdownTimer.classList.add("hidden");
-                }
-            }, 1000);
-        }
-
-        // Function to display the image
-        function displayImage(imageUrl, name) {
-            imageDisplay.classList.remove("hidden");
-
-            const imageElement = document.createElement('img');
-            imageElement.src = imageUrl;
-            imageElement.alt = name;
-
-            imageDisplay.innerHTML = ''; // Clear any previous image
-            imageDisplay.appendChild(imageElement);
-        }
-
-        // Reset game state
-        function resetGame() {
-            timerElement.textContent = "";
-            timerElement.classList.add("hidden");
-            imageDisplay.classList.add("hidden");
-            startButton.disabled = false; // Re-enable the Go button
-        }
-
-    </script>
+    <section id="scoreboard" data-region="scoreboard"><div class="section-heading"><div><p class="eyebrow">A LITTLE FRIENDLY COMPETITION</p><h2>Scoreboard</h2></div><button id="finish" disabled><svg class="icon" aria-hidden="true"><use href="#icon-trophy"/></svg>Finish game</button></div><div id="scores"></div><p id="finishHint" class="field-hint">Play a round to start collecting points.</p></section>
+    <section id="historySection" data-region="history"><div class="section-heading"><h2>Round history</h2><span id="historyCount" class="count-badge">0 rounds</span></div><p id="historyEmpty" class="empty-state">Your story starts with the first round.</p><ol id="history"></ol></section>
+    <dialog id="confirmation" aria-labelledby="confirmText"><p id="confirmText"></p><div class="actions"><button id="confirmYes" class="primary-button">Confirm</button><button id="confirmNo">Keep playing</button></div></dialog>
+    <footer><span>Made for good times, not perfect drawings.</span><span>Scores stay here until you refresh.</span></footer>
+  </main>
+  <script src="Data.js"></script><script src="game-core.js"></script><script src="timer-controller.js"></script><script src="audio.js"></script><script src="app.js"></script>
 </body>
-
 </html>

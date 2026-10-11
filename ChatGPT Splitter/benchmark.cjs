@@ -1,0 +1,1 @@
+const core=require('./split-core');for(const size of [50000,500000,2000000]){const text=('This is a sample sentence.\n\n').repeat(Math.ceil(size/28)).slice(0,size);const start=performance.now();const b=core.buildBundle(text,{messageLimit:12000});console.log(size+' chars: '+Math.round(performance.now()-start)+'ms, '+b.totalParts+' parts');}

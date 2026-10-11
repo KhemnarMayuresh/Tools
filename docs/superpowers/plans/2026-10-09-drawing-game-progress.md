@@ -1,0 +1,26 @@
+# Drawing Game implementation progress
+Plan: docs/superpowers/plans/2026-10-09-drawing-game.md
+Scope: Drawing Game only; preserve existing uncommitted Splitter work. Existing feature checkout reused; no commit/push requested.
+Preflight: core supplies immutable state to app; timer uses round IDs; data supplies categoryName snapshot. Interfaces consistent.
+Tasks 1–2: asset audit and core/timer tests written first and observed failing; modules implemented. Default expiry is 32 seconds after preparation starts, including delayed callbacks.
+Tasks 1–2: complete — 129 prompts/18 categories, exact image case; lifecycle/deadline cancellation tests pass.
+Tasks 3–4: complete — roster, score correction, winner/no-winner review, skipped/aborted history, confirmations, custom batch validation, search and tri-state selections. Edge mobile workflow passed.
+Task 5: complete — synthesized audio, mute/volume/failure handling, hidden-tab cue suppression, images/fallback, themes, reduced motion and touch targets. Desktop/mobile screenshots inspected.
+Task 6: verification — Edge direct-file smoke and real 10-second round passed; Firefox unavailable. Existing Text-Compare/Splitter regression tests passed. Only Drawing Game and its progress document edited; unrelated work preserved.
+Ruling: Rebuilt category controls use direct handlers attached after creation rather than event delegation — stable IDs and rendered state avoid name selectors; cost if wrong is redundant handler creation, not stale game state.
+Ruling: Skill shell-helper workspace/commit steps replaced by this retained Windows progress file — plan explicitly excludes commits and workspace contains unrelated work; cost is manual progress tracking.
+Final audio fix: asynchronous AudioContext.resume reproduced missing Ready cue (browser assertion RED: Set/Go only). Guarded Ready cue after successful resume now observes phase/round/stage and visibility; reset cannot replay the cue. Browser integration and full suite rerun after fix.
+Formatting verification: all four extracted modules pass node --check; Drawing Game11 tests pass after formatting. Browser smoke rerun after formatting.
+Independent reviewer source-read blocked (579s without output). Supplied exact lifecycle/timer/audio/DOM/custom contracts to reviewer for a limited review; no independent filesystem verification can be claimed.
+Final review: limited excerpt review found no confirmed material issues; complete independent source review unavailable. No deferred findings. Browser smoke passes after formatting; EOF whitespace fixed and final diff check clean.
+
+## Approved UI redesign
+User approved the bounded design: icon theme controls top-right; collapsed configuration; play image/timer; scoreboard; history; animated results podium and remaining ranking rows.
+Implemented native collapsed details for all configuration, lighter professional layout and mobile stack, prominent Start round, contextual instructions and inline setup feedback. Scores remain visible between rounds. Finish is blocked until active round resolves; finished state freezes gameplay until New Game/Play again. Podium supports 1–12 players, stable shared competition ranks, long labels, and reduced motion. Empty scores do not claim a sole winner.
+Verification: 40 repository tests passed (13 Drawing Game); Edge redesign smoke covers layout order, themes/persistence, keyboard, podium3/restrows, 1/2/12 players, long names, zero-point completion, Play again and 375px/reduced motion. Existing gameplay smoke and real10s integration passed. Desktop/mobile light/dark/results screenshots inspected. Syntax and diff checks clean. Firefox unavailable. Independent excerpt review found no material issues; reviewer did not inspect full source.
+No new design rulings or deferred findings. No commits or pushes performed.
+
+## Approved Everyday Things category
+Added150 easy words covering utensils, household items, clothing, school supplies, transport, food, vegetables/fruit, play and animals. Category is first in the inventory and selected by default; total inventory279/19categories. Text-only prompts need no downloaded images.
+Edit words supports 1–200 unique words, adding/renaming/removing, atomic validation, blank/duplicate normalization, Cancel, and confirmed Restore defaults. Only this list persists locally, with safe fallback on malformed/blocked storage. Existing selections are retained and newly added words selected. Stable IDs derive from NFC/case-insensitive keys; usage remains after removal/re-addition. Review/history labels remain snapshots. Busy/finished state disables edits. Custom-add routes Everyday Things through the same validator and persistence.
+Verification: 44 repository tests passed (17 Drawing Game). Edge everyday/editor storage suites verify saving/reload, restoring/cancel, limits, invalid/blocked storage, literal text, busy locking, retained review/used words and custom-add integration. Existing gameplay/redesign suites rerun; controlled clocks explicitly paused to remove Ready-vs-Set timing race. Editor mobile screenshot inspected. Syntax/diff checks clean. Excerpt reviewer suggested case-sensitive IDs, disproved by exact code and existing Cup/CUP + Unicode ID tests; no material unresolved finding. Firefox unavailable from prior runtime audit. No commits/pushes.

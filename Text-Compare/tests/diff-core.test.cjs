@@ -1,0 +1,10 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const core=require('../diff-core.js');
+test('empty inputs have no phantom lines',()=>assert.deepEqual(core.compareLines('','').rows,[]));
+test('replacement counts and positions',()=>{const r=core.compareLines('a\nb\n','a\nc\n');assert.equal(r.additions,1);assert.equal(r.deletions,1);assert.deepEqual(r.rows.map(x=>[x.kind,x.oldLine,x.newLine]),[['equal',1,1],['delete',2,null],['insert',null,2]]);});
+test('line endings normalize but final newline matters',()=>{assert.equal(core.compareLines('a\r\n','a\n').additions,0);assert.equal(core.compareLines('a','a\n').additions,1);});
+test('horizontal whitespace ignores neither case nor blank lines',()=>{assert.equal(core.compareLines(' a\t b ','a b',{ignoreWhitespace:true}).additions,0);assert.equal(core.compareLines('a','A',{ignoreWhitespace:true}).additions,1);assert.equal(core.compareLines('a\n','a\n\n',{ignoreWhitespace:true}).additions,1);});
+test('hunk ranges merge context and handle empty side',()=>{const r=core.compareLines('','x\n');assert.deepEqual(core.buildHunks(r.rows,3),[{startRow:0,endRow:1,oldStart:0,oldCount:0,newStart:1,newCount:1}]);});
+test('inline tokens reconstruct Unicode input',()=>{const a='const संख्या = "😀";',b='const संख्या = "😃";';const r=core.compareInline(a,b);assert.equal(r.oldTokens.map(t=>t.text).join(''),a);assert.equal(r.newTokens.map(t=>t.text).join(''),b);assert.ok(r.newTokens.some(t=>t.changed));});
+test('repeated lines reconstruct both inputs deterministically',()=>{for(let seed=0;seed<120;seed++){const a=Array.from({length:seed%13},(_,i)=>String((i*7+seed)%4)).join('\n');const b=Array.from({length:seed%17},(_,i)=>String((i*3+seed)%5)).join('\n');const r=core.compareLines(a,b);assert.equal(r.rows.filter(x=>x.oldLine!==null).map(x=>x.oldText).join('\n'),a);assert.equal(r.rows.filter(x=>x.newLine!==null).map(x=>x.newText).join('\n'),b);}});
