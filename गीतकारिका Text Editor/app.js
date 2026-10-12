@@ -112,7 +112,7 @@
       const sectionMenu=moreMenu('Section options','section-menu'),sectionOptions=node('div','','menu-content');
       EditorIcons.label(collapse,'chevronDown',section.collapsed?'Expand section':'Collapse section');collapse.className='menu-row';sectionOptions.append(collapse);
       const sizes=node('details','','layout-options');sizes.append(resizeSummary('Resize section'));const fields=node('div','','size-fields');fields.append(sizeField('Width (px)',section.width,'updateSection',section.id,'width',240),sizeField('Height (px)',section.height,'updateSection',section.id,'height',120));sizes.append(fields);
-      const removeSection=button('','deleteSection',section.id);EditorIcons.label(removeSection,'trash','Delete section');removeSection.classList.add('danger','menu-row');sectionOptions.append(sizes,removeSection);sectionMenu.append(sectionOptions);actions.append(sectionMenu);top.append(actions);top.insertBefore(node('p','','section-count'),actions);
+      const removeSection=button('','deleteSection',section.id);EditorIcons.label(removeSection,'trash','Delete section');removeSection.classList.add('danger','menu-row');const exportSection=button('','exportSectionText',section.id);EditorIcons.label(exportSection,'download','Export section as TXT');exportSection.className='menu-row';sectionOptions.append(sizes,exportSection,removeSection);sectionMenu.append(sectionOptions);actions.append(sectionMenu);top.append(actions);top.insertBefore(node('p','','section-count'),actions);
       const body=node('div','','section-body');body.dataset.dropSection=section.id;
       if(!section.blocks.length)body.append(node('div','Add text here, or move a text block into this section.','drop-empty'));
       for(const block of section.blocks){
@@ -153,6 +153,7 @@
     if(action==='addSection')addSection();else if(action==='addBlock')addBlock(id);
     else if(action==='selectSection'){selectedSection=id;renderDocument();$('workspace').querySelector(`[data-title="${id}"]`)?.focus();}
     else if(action==='collapse')perform({type:'updateSection',id,patch:{collapsed:!findSection(id).collapsed}});
+    else if(action==='exportSectionText'){const section=findSection(id);if(section){const filename=(section.title||'Untitled section').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').replace(/[. ]+$/g,'').slice(0,100)||'section';download(F.exportText({sections:[section]}),filename+'.txt','text/plain;charset=utf-8');notice('Section TXT downloaded.');}}
     else if(action==='deleteSection')ask('Delete this section and all its text? You can Undo this change.',()=>{savedSelection=null;perform({type:'deleteSection',id});$('addSection').focus();});
     else if(action==='deleteBlock')ask('Delete this text block? You can Undo this change.',()=>{savedSelection=null;perform({type:'deleteBlock',id});$('addSection').focus();});
     else if(action==='sectionUp'||action==='sectionDown'){const index=doc().sections.findIndex(s=>s.id===id),target=index+(action==='sectionUp'?-1:1);if(target>=0&&target<doc().sections.length){perform({type:'moveSection',id,index:target});$('workspace').querySelector(`[data-action="${action}"][data-id="${id}"]`)?.focus();}}

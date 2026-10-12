@@ -73,6 +73,7 @@ Open [the local editor](http://localhost:8000/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%
 | Export JSON backup | Downloads the versioned document, including safe formatting, IDs, order, collapsed state and sizes. Theme and undo history are not included. |
 | Import JSON | Validates and sanitizes the whole backup before asking to replace the current document. Cancel keeps your work. Undo can restore the previous document during this session. |
 | Import TXT | Adds a plain-text block to the selected section; creates a section if none exists. Preserves line breaks and treats markup literally. |
+| Export section as TXT (section ⋯ menu) | Downloads only that section’s title and text blocks in document order, including when collapsed. Uses the section title as the filename; formatting is omitted. |
 | Export TXT | Downloads section titles and plain text in document order, omitting editor controls. Formatting and layout are not included. |
 | Print / Save as PDF | Opens the browser print dialog. All sections print, even when collapsed. Choose Save as PDF in that dialog. |
 | Download recovery data | Keeps an untouched copy of unreadable saved data before an explicit Start fresh or JSON replacement. |
