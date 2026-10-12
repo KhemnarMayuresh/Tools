@@ -80,3 +80,14 @@ body{font-family:Inter,'Segoe UI','Nirmala UI',sans-serif;font-size:14px;backgro
 /* Keep Find at the right edge of the writing toolbar. */
 .toolbar .find-toggle{margin-left:auto}
 
+/* Compact studio controls and canvas spacing. */
+.toolbar{padding:6px 0}
+.toolbar button,.toolbar select{min-height:30px;height:30px;padding:3px 10px}
+.toolbar .alignment-buttons{padding:1px}
+.toolbar .alignment-buttons button{width:30px;padding:0}
+.status-bar{padding:6px 14px}
+.section-card{padding:2px 8px 8px 8px}
+.section-actions>button,.section-actions>.item-menu>summary{min-height:36px;height:36px;min-width:36px;width:36px;padding:6px}
+
+.block-card{padding:0px 10px}
+
