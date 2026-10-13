@@ -1,0 +1,4 @@
+const t=require('node:test'),a=require('node:assert/strict'),C=require('../core.js');
+t('exact words with truncated opening',()=>{const r=C.generate({type:'words',count:2,start:true,seed:'x'});a.equal(r.text,'Lorem ipsum');a.equal(r.words,2);});
+t('seed repeatability and paragraph/list quantities',()=>{const options={type:'paragraphs',count:4,length:'short',seed:'hello',start:true};a.deepEqual(C.generate(options),C.generate(options));a.equal(C.generate(options).items.length,4);const r=C.generate({type:'list',count:3,format:'html',seed:'x'});a.equal((r.output.match(/<li>/g)||[]).length,3);a.ok(r.output.startsWith('<ul>'));});
+t('sentence counts and limits',()=>{const r=C.generate({type:'sentences',count:7,seed:'x'});a.equal(r.items.length,7);a.equal((r.text.match(/\./g)||[]).length,7);a.throws(()=>C.generate({type:'words',count:10001}),/limit/i);a.throws(()=>C.generate({type:'paragraphs',count:1.5}));});

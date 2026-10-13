@@ -1,0 +1,1 @@
+importScripts('core.js');onmessage=event=>{try{const node=JSONTool.parse(event.data.source);postMessage({id:event.data.id,node,duplicates:JSONTool.duplicates(node)});}catch(error){postMessage({id:event.data.id,error:error.message,offset:error.offset});}};

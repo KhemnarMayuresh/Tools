@@ -1,0 +1,5 @@
+const t=require('node:test'),a=require('node:assert/strict'),C=require('../core.js');
+t('standard definitions',()=>{a.equal(C.convert(1,'length','km','m'),1000);a.equal(C.convert(1,'mass','lb','kg'),.45359237);a.equal(C.convert(1,'storage','KiB','B'),1024);a.equal(C.convert(1,'storage','kB','B'),1000);});
+t('temperature and absolute zero',()=>{a.ok(Math.abs(C.convert(32,'temperature','F','C'))<1e-10);a.equal(C.convert(0,'temperature','C','K'),273.15);a.throws(()=>C.convert(-274,'temperature','C','K'),/absolute zero/i);});
+t('round trips and invalid ranges',()=>{for(const category of Object.keys(C.categories)){const units=C.categories[category].units;for(const unit of units){const value=category==='temperature'?300:123.45;const converted=C.convert(value,category,units[0].id,unit.id);a.ok(Math.abs(C.convert(converted,category,unit.id,units[0].id)-value)<1e-8);}}a.throws(()=>C.convert(-1,'mass','kg','lb'));a.throws(()=>C.convert(Infinity,'length','m','km'));});
+t('scientific notation and strict input',()=>{a.equal(C.parse('1e3'),1000);a.throws(()=>C.parse('1,000'));a.throws(()=>C.parse(''));a.throws(()=>C.parse('0x10'));});

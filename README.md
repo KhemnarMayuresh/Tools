@@ -1,6 +1,6 @@
 # Tools
 
-A collection of six browser tools and games for writing, comparing text, and playing together. Each tool has its own guide with instructions, features, requirements and developer checks.
+A collection of eleven browser tools and games for writing, comparing text, and playing together. Each tool has its own guide with instructions, features, requirements and developer checks.
 
 ## Tool Directory
 
@@ -12,6 +12,11 @@ A collection of six browser tools and games for writing, comparing text, and pla
 | **Infinite Tic Tac Toe** | Play a strategic Tic Tac Toe variant where your oldest marks leave the board. | [Open](Infinite%20Tic%20Tac%20Toe/index.html) | [README](Infinite%20Tic%20Tac%20Toe/README.md) |
 | **Passing the Parcel Game** | Host a physical party game or a labelled on-screen parcel simulation. | [Open](Passing%20the%20Parcel%20Game/PassingTheParcel.html) | [README](Passing%20the%20Parcel%20Game/README.md) |
 | **गीतकारिका Text Editor — Lyricist Studio** | Write and organize verses, notes and ideas in a local section-based studio. | [Open](%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html) | [README](%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/README.md) |
+| **JSON Formatter & Viewer** | Format, validate and explore JSON without rounding numeric literals. | [Open](JSON%20Formatter%20%26%20Viewer/index.html) | [README](JSON%20Formatter%20%26%20Viewer/README.md) |
+| **Regex Tester** | Test JavaScript patterns, captures and replacements in an isolated worker. | [Open](Regex%20Tester/index.html) | [README](Regex%20Tester/README.md) |
+| **Pomodoro Timer** | Focus/break cycles with recovery and daily progress. | [Open](Pomodoro%20Timer/index.html) | [README](Pomodoro%20Timer/README.md) |
+| **Unit Converter** | Convert ten categories with clear definitions and configurable precision. | [Open](Unit%20Converter/index.html) | [README](Unit%20Converter/README.md) |
+| **Lorem Ipsum Generator** | Generate paragraphs, sentences, words and lists with optional repeatable seeds. | [Open](Lorem%20Ipsum%20Generator/index.html) | [README](Lorem%20Ipsum%20Generator/README.md) |
 
 ## Getting Started
 
@@ -102,6 +107,36 @@ Write and organize verses, notes and ideas in a local section-based studio.
 
 [Full guide](%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/README.md) · [HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html) · [GitHack preview](https://raw.githack.com/KhemnarMayuresh/Tools/main/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor/%E0%A4%97%E0%A5%80%E0%A4%A4%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A4%BE%20Text%20Editor%20.html)
 
+### JSON Formatter & Viewer
+
+Paste or open UTF-8 JSON, then choose **Format** or **Minify**. Switch to Tree to explore nodes, search keys/values and copy JSON Pointer paths or node values. Supports indentation settings, duplicate-key warnings, literal-preserving large numbers, standard JSON downloads and cancellable worker processing.
+
+[Full guide](JSON%20Formatter%20%26%20Viewer/README.md) · [HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/JSON%20Formatter%20%26%20Viewer/index.html) · [GitHack preview](https://raw.githack.com/KhemnarMayuresh/Tools/main/JSON%20Formatter%20%26%20Viewer/index.html)
+
+### Regex Tester
+
+Enter a pattern and flags, paste test text, then Run. Includes highlighted matches, capture groups, UTF-16 positions, navigation, replacement previews, syntax examples, shared SVG theme icons and clipboard fallback. Worker-only execution has a two-second timeout and Cancel control.
+
+[Full guide](Regex%20Tester/README.md) · [HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Regex%20Tester/index.html) · [GitHack preview](https://raw.githack.com/KhemnarMayuresh/Tools/main/Regex%20Tester/index.html)
+
+### Pomodoro Timer
+
+Start a 25-minute focus session, then follow short and long breaks. Includes configurable durations, pause/reset/skip, optional task and local alerts, daily progress/history, saved deadline recovery and Web Locks coordination across tabs. Uses the shared SVG icons and theme controls.
+
+[Full guide](Pomodoro%20Timer/README.md) · [HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Pomodoro%20Timer/index.html) · [GitHack preview](https://raw.githack.com/KhemnarMayuresh/Tools/main/Pomodoro%20Timer/index.html)
+
+### Unit Converter
+
+Choose a category, enter a value and select From/To units. Includes live conversion, swap/copy, all-units table, decimal-place/significant-figure settings, temperature boundaries, distinct US/Imperial volume and decimal/binary storage units. Uses shared SVG icons and theme controls.
+
+[Full guide](Unit%20Converter/README.md) · [HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Unit%20Converter/index.html) · [GitHack preview](https://raw.githack.com/KhemnarMayuresh/Tools/main/Unit%20Converter/index.html)
+
+### Lorem Ipsum Generator
+
+Choose an output type and quantity, then Generate. Includes exact word counts, paragraph lengths, opening phrase, optional repeatable seed, plain-text/HTML source, counts, copy/download and shared SVG theme controls.
+
+[Full guide](Lorem%20Ipsum%20Generator/README.md) · [HTML Preview](https://htmlpreview.github.io/?https://github.com/KhemnarMayuresh/Tools/blob/main/Lorem%20Ipsum%20Generator/index.html) · [GitHack preview](https://raw.githack.com/KhemnarMayuresh/Tools/main/Lorem%20Ipsum%20Generator/index.html)
+
 ## Demo Versions
 
 The third-party preview links use the published **main** branch. Local changes appear there only after they are published. Preview availability has not been verified for this documentation update; downloaded files provide the current local version. Historical editor demos remain linked in the editor’s guide.
@@ -110,6 +145,11 @@ The third-party preview links use the published **main** branch. Local changes a
 
 | Tool | What is retained |
 | --- | --- |
+| Lorem Ipsum Generator | Theme and generation preferences; output and seed are session-only. |
+| Unit Converter | Theme, category, unit selections and precision; input values are session-only. |
+| Pomodoro Timer | Timer state, optional task, settings, preferences and up to 500 history entries. |
+| Regex Tester | Theme and automatic-run preference; patterns, text and results are session-only. |
+| JSON Formatter & Viewer | Theme and indentation preferences; JSON content is never automatically saved. |
 | Text Compare | Theme preference; comparison text is not automatically saved. |
 | ChatGPT Splitter | Theme and numeric profile budgets; source, instructions, edited parts and copy progress are not saved. |
 | Drawing Game | Theme/sound preferences and the saved Everyday Things list; players, scores, history, selections and other custom categories clear on refresh. |
